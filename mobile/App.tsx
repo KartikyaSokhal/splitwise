@@ -11,7 +11,7 @@ export default function App() {
     <SafeAreaProvider>
       <BillProvider>
         <SafeAreaView style={styles.safeArea} edges={["top", "bottom", "left", "right"]}>
-          <StatusBar style="dark" backgroundColor={COLORS.background} />
+          <StatusBar style="dark"/>
           <View style={styles.container}>
             <RootNavigator />
           </View>
