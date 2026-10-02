@@ -1,37 +1,28 @@
-# MVP Tasks
+# 48-Hour MVP Tasks
 
-## Foundation
-- [ ] Git repo and docs
-- [ ] Expo mobile app
-- [ ] Express backend
-- [ ] env configuration
-- [ ] lint/format/test setup
+## Release-critical (build first)
+- [ ] Expo app and local guest/session state
+- [ ] integer-minor-unit money and deterministic split module with unit tests
+- [ ] total-only manual entry
+- [ ] people entry and stable ordering
+- [ ] equal split and custom-amount validation
+- [ ] review screen that displays exact final shares
+- [ ] native share sheet with a readable bill summary
+- [ ] loading, validation, and manual-flow error states
 
-## Manual split
-- [ ] amount/items
-- [ ] people
-- [ ] equal split
-- [ ] custom split
-- [ ] item assignment
-- [ ] deterministic money utility
+## Receipt enhancement (only after the core flow works)
+- [ ] Express extraction endpoint and backend environment configuration
+- [ ] image permission, capture/picker, and constrained upload
+- [ ] Gemini structured extraction and server-side schema validation
+- [ ] editable receipt draft screen
+- [ ] safe API errors and direct manual-entry fallback
 
-## Receipt
-- [ ] camera permission
-- [ ] capture/upload
-- [ ] Gemini endpoint
-- [ ] schema validation
-- [ ] editable extracted bill
-- [ ] fallback/error states
+## Time-boxed / optional
+- [ ] item entry and item assignment, only with all rules in `money-and-splits.md`
+- [ ] iOS and Android smoke tests
+- [ ] security review and production deployment configuration
 
-## Sharing/release
-- [ ] summary + WhatsApp/share
-- [ ] iOS/Android testing
-- [ ] security review
-- [ ] store assets
-- [ ] production builds
-
-## Future
-- [ ] login/history/groups/trips
-- [ ] recurring expenses
-- [ ] UPI links
-- [ ] advanced reports
+## Explicitly deferred to Phase 2
+- [ ] Supabase setup, authentication, persistence/history, groups, and trips
+- [ ] payments, UPI links, recurring expenses, analytics, reports, merchant integrations
+- [ ] store assets and store submission work

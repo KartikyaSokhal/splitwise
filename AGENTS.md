@@ -7,11 +7,12 @@ Build a simple bill-splitting app whose core flow completes in under 30 seconds.
 Read README.md and relevant docs in docs/. Do not silently change architecture or scope.
 
 ## Stack
-React Native + Expo + TypeScript; Node.js + Express + TypeScript; Supabase PostgreSQL; Gemini API.
+React Native + Expo + TypeScript; Node.js + Express + TypeScript; Gemini API. Supabase PostgreSQL is a Phase 2 persistence option, not an MVP dependency.
 
 ## Product rules
 - No mandatory login for MVP.
 - Manual splitting always works without AI.
+- The release-critical flow is total-only: total -> people -> equal/custom -> review -> native share sheet.
 - AI output must be editable and validated.
 - WhatsApp is only for sharing; it does not calculate bills.
 - No payment processing in MVP.

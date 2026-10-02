@@ -4,13 +4,19 @@
 Split any bill in under 30 seconds.
 
 ## MVP flow
-Open without account -> Scan bill or Enter manually -> add people -> Equal / Custom / Item split -> review -> Share on WhatsApp.
+Open without account -> enter total -> add people -> Equal or Custom split -> review -> native share sheet.
+
+The total-only manual path is the launch requirement. It must work without a camera, network connection, Gemini, or an account. WhatsApp is an intended share destination, but sharing uses the native platform sheet.
+
+Receipt scan and itemized splitting are optional enhancements. If present, they must offer a visible manual-entry escape hatch at every failure point.
 
 ## Receipt flow
-Capture -> backend -> Gemini extraction -> validate -> editable bill -> user confirms -> split.
+Capture or choose image -> backend -> Gemini extraction -> validate -> editable draft -> user confirms/edits -> local split.
+
+The user can edit or discard every extracted financial field. A draft is never a confirmed bill until the user reviews it.
 
 ## Non-goals
-Payments, mandatory login, analytics, bank integrations, recurring household expenses, merchant integrations.
+Payments, mandatory login, persistence/history, groups, analytics, bank integrations, recurring household expenses, merchant integrations, and direct WhatsApp integration.
 
 ## Later
-History, groups, trips, login, recurring expenses, UPI links, advanced reports.
+Supabase persistence/history, groups, trips, login, recurring expenses, UPI links, advanced reports.
