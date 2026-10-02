@@ -4,7 +4,6 @@
     "slug": "split",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "backgroundColor": "#F8FAFC"
@@ -12,10 +11,8 @@
     "ios": {
       "supportsTablet": true
     },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#4F46E5"
-      }
-    }
+    "plugins": [
+      "expo-asset"
+    ]
   }
 }

@@ -44,8 +44,8 @@ export const ReviewScreen: React.FC = () => {
         title: "Bill Split",
       });
 
-      // Navigate to SUCCESS screen after invoking share
-      if (result.action === Share.sharedAction || result.action === Share.dismissedAction) {
+      // Only confirm success when the platform reports that the content was shared.
+      if (result.action === Share.sharedAction) {
         navigate("SUCCESS");
       }
     } catch (error) {

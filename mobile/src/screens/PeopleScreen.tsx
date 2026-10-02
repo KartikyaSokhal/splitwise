@@ -47,12 +47,12 @@ export const PeopleScreen: React.FC = () => {
   };
 
   const handleContinue = () => {
-    if (people.length >= 2) {
+    if (people.length >= 1) {
       navigate("SPLIT_METHOD");
     }
   };
 
-  const isContinueDisabled = people.length < 2;
+  const isContinueDisabled = people.length < 1;
 
   // Filter suggestions to those not already added
   const availableSuggestions = QUICK_SUGGESTIONS.filter(
@@ -102,17 +102,9 @@ export const PeopleScreen: React.FC = () => {
             <Text style={styles.emptyEmoji}>👥</Text>
             <Text style={styles.emptyTitle}>No people added</Text>
             <Text style={styles.emptySubtitle}>
-              Add at least 2 people to split this bill.
+              Add at least 1 person to split this bill.
             </Text>
           </View>
-        ) : null}
-
-        {/* Minimum requirement warning */}
-        {people.length === 1 ? (
-          <ErrorMessage
-            message="Add at least 1 more person to split the bill."
-            type="warning"
-          />
         ) : null}
 
         {/* Inline Add Person Card */}

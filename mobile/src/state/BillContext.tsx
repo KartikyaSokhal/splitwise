@@ -52,12 +52,6 @@ export type BillContextType = {
   startNewSplit: () => void;
 };
 
-const DEFAULT_PEOPLE: Person[] = [
-  { id: "p-1", name: "Kartikya", isYou: true },
-  { id: "p-2", name: "Rahul" },
-  { id: "p-3", name: "Aman" },
-];
-
 const BillContext = createContext<BillContextType | null>(null);
 
 export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -66,14 +60,10 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
   const [screenHistory, setScreenHistory] = useState<ScreenName[]>(["HOME"]);
   const currentScreen = screenHistory[screenHistory.length - 1] ?? "HOME";
 
-  const [totalInput, setTotalInputState] = useState<string>("1240");
-  const [people, setPeople] = useState<Person[]>(DEFAULT_PEOPLE);
+  const [totalInput, setTotalInputState] = useState<string>("");
+  const [people, setPeople] = useState<Person[]>([]);
   const [splitMethod, setSplitMethodState] = useState<SplitMethod>("equal");
-  const [customShares, setCustomShares] = useState<CustomSharesInput>({
-    "p-1": "413.34",
-    "p-2": "413.33",
-    "p-3": "413.33",
-  });
+  const [customShares, setCustomShares] = useState<CustomSharesInput>({});
 
   const navigate = useCallback((nextScreen: ScreenName) => {
     setScreenHistory((prev) => [...prev, nextScreen]);
@@ -215,19 +205,16 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const resetBill = useCallback(() => {
-    setTotalInputState("1240");
-    setPeople(DEFAULT_PEOPLE);
+    setTotalInputState("");
+    setPeople([]);
     setSplitMethodState("equal");
-    setCustomShares({
-      "p-1": "413.34",
-      "p-2": "413.33",
-      "p-3": "413.33",
-    });
+    setCustomShares({});
     setScreenHistory(["HOME"]);
   }, []);
 
   const startNewSplit = useCallback(() => {
     setTotalInputState("");
+    setPeople([]);
     setSplitMethodState("equal");
     setCustomShares({});
     setScreenHistory(["HOME", "ENTER_TOTAL"]);
