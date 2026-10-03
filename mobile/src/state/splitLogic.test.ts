@@ -13,7 +13,7 @@ const samplePeople: Person[] = [
   { id: "3", name: "Aman" },
 ];
 
-test("calculateEqualSplit: ₹1,000 (100000 paise) across 3 people produces ₹334.00, ₹333.00, ₹333.00", () => {
+test("calculateEqualSplit: ₹1,000 (100000 paise) across 3 people produces ₹333.34, ₹333.33, ₹333.33", () => {
   const shares = calculateEqualSplit(100000, samplePeople);
   assert.equal(shares.length, 3);
   assert.equal(shares[0].shareMinor, 33334);

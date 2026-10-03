@@ -1,4 +1,9 @@
-import { formatMinorAsInr } from "./money.ts";
+import {
+  assertMinorAmount,
+  formatMinorAsInr,
+  isValidLabel,
+  MoneyValidationError,
+} from "./money.ts";
 
 export type ShareItem = {
   name: string;
@@ -9,7 +14,7 @@ export type ShareItem = {
  * Generates clean, readable text summary for native sharing.
  *
  * Example:
- * Bill split
+ * DueShare · Bill split
  *
  * Total: ₹1,240.00
  *
@@ -21,13 +26,28 @@ export function generateShareText(
   totalMinor: number,
   shares: readonly ShareItem[],
 ): string {
+  assertMinorAmount(totalMinor, "total");
+  if (totalMinor === 0 || !Array.isArray(shares) || shares.length === 0) {
+    throw new MoneyValidationError(
+      "A positive total and participants are required to share.",
+    );
+  }
+  let allocated = 0n;
+  for (const item of shares) {
+    if (!item || !isValidLabel(item.name))
+      throw new MoneyValidationError("Invalid participant name.");
+    assertMinorAmount(item.shareMinor, "share");
+    allocated += BigInt(item.shareMinor);
+  }
+  if (allocated !== BigInt(totalMinor))
+    throw new MoneyValidationError("Shares must equal the bill total.");
   const formattedTotal = formatMinorAsInr(totalMinor);
   const shareLines = shares.map(
     (item) => `${item.name}: ₹${formatMinorAsInr(item.shareMinor)}`,
   );
 
   return [
-    "Bill split",
+    "DueShare · Bill split",
     "",
     `Total: ₹${formattedTotal}`,
     "",

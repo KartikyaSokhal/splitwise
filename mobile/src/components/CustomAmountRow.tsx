@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,10 +14,11 @@ export type CustomAmountRowProps = {
   isYou?: boolean;
   value: string;
   onChangeValue: (val: string) => void;
-  onCommitValue?: () => void;
+  onCommitValue?: (value: string) => void;
   isPinned?: boolean;
   onTogglePin?: () => void;
   percentOfTotal?: number;
+  maxLength?: number;
 };
 
 export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
@@ -29,7 +30,17 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
   isPinned = false,
   onTogglePin,
   percentOfTotal,
+  maxLength = 12,
 }) => {
+  const draft = useRef(value);
+  const initial = useRef(value);
+  const dirty = useRef(false);
+  const commit = () => {
+    if (!dirty.current) return;
+    dirty.current = false; // Done followed by blur is one commit.
+    initial.current = draft.current;
+    onCommitValue?.(draft.current);
+  };
   return (
     <View style={styles.card}>
       <Avatar name={name} size={42} />
@@ -84,9 +95,18 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
         </Text>
         <TextInput
           value={value}
-          onChangeText={onChangeValue}
-          onBlur={onCommitValue}
-          onSubmitEditing={onCommitValue}
+          onFocus={() => {
+            initial.current = value;
+            draft.current = value;
+            dirty.current = false;
+          }}
+          onChangeText={(text) => {
+            draft.current = text;
+            dirty.current = text !== initial.current;
+            onChangeValue(text);
+          }}
+          onBlur={commit}
+          onSubmitEditing={commit}
           returnKeyType="done"
           keyboardType="numeric"
           placeholder="0"
@@ -94,7 +114,7 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
           accessible={true}
           accessibilityLabel={`Amount for ${name}`}
           style={styles.input}
-          maxLength={9}
+          maxLength={maxLength}
         />
       </View>
     </View>
@@ -104,6 +124,7 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
 const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
+    flexWrap: "wrap",
     alignItems: "center",
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
@@ -123,6 +144,7 @@ const styles = StyleSheet.create({
   },
   nameRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     alignItems: "center",
   },
   name: {
@@ -158,7 +180,7 @@ const styles = StyleSheet.create({
     borderColor: "#E0E7FF",
     paddingHorizontal: SPACING.md,
     minWidth: 110,
-    height: 44,
+    minHeight: 48,
   },
   inputWrapperPinned: {
     backgroundColor: "#FFFBEB",
@@ -183,6 +205,8 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   pinnedBadge: {
+    minHeight: 44,
+    justifyContent: "center",
     backgroundColor: COLORS.warningLight,
     borderWidth: 1,
     borderColor: "#FDE68A",

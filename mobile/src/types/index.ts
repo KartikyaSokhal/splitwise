@@ -8,6 +8,9 @@ export type SplitMethod = "equal" | "custom";
 
 export type ScreenName =
   | "HOME"
+  | "ACCOUNT"
+  | "GROUPS"
+  | "HISTORY"
   | "ENTER_TOTAL"
   | "PEOPLE"
   | "SPLIT_METHOD"

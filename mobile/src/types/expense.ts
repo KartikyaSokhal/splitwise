@@ -24,6 +24,8 @@ export type ParticipantBalance = {
 };
 
 export type ExpenseValidationIssueCode =
+  | "INVALID_METADATA"
+  | "INVALID_PARTICIPANTS"
   | "INVALID_TOTAL"
   | "INVALID_PAYMENT_AMOUNT"
   | "INVALID_SHARE_AMOUNT"

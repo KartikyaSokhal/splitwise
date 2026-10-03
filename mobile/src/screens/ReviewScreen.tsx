@@ -1,12 +1,5 @@
-import React, { useState } from "react";
-import {
-  Alert,
-  ScrollView,
-  Share,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import React, { useRef, useState } from "react";
+import { Alert, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { ScreenHeader } from "../components/ScreenHeader.tsx";
 import { Avatar } from "../components/Avatar.tsx";
@@ -14,7 +7,7 @@ import { PrimaryButton } from "../components/PrimaryButton.tsx";
 import { SecondaryButton } from "../components/SecondaryButton.tsx";
 import { useBill } from "../state/BillContext.tsx";
 import { formatMinorAsInr } from "../utils/money.ts";
-import { generateShareText } from "../utils/share.ts";
+import { prepareBillShare, shareCurrentBill } from "../state/shareBoundary.ts";
 
 export const ReviewScreen: React.FC = () => {
   const {
@@ -23,37 +16,48 @@ export const ReviewScreen: React.FC = () => {
     calculatedShares,
     navigate,
     goBack,
+    totalInput,
+    people,
+    customShares,
   } = useBill();
 
   const [sharing, setSharing] = useState(false);
+  const sharingNow = useRef(false);
+  const snapshot = { totalInput, people, splitMethod, customShares };
+  const latestSnapshot = useRef(snapshot);
+  latestSnapshot.current = snapshot;
+  let canShare = false;
+  try {
+    prepareBillShare(snapshot);
+    canShare = true;
+  } catch {
+    /* edit state is not shareable */
+  }
 
-  const formattedTotal = totalMinor !== null ? formatMinorAsInr(totalMinor) : "0.00";
+  const formattedTotal =
+    totalMinor !== null ? formatMinorAsInr(totalMinor) : "0.00";
 
   const handleShare = async () => {
-    if (totalMinor === null) return;
+    if (sharingNow.current) return;
+    sharingNow.current = true;
     try {
       setSharing(true);
-      const shareItems = calculatedShares.map((s) => ({
-        name: s.name,
-        shareMinor: s.shareMinor,
-      }));
-      const message = generateShareText(totalMinor, shareItems);
-
-      const result = await Share.share({
-        message,
-        title: "Bill Split",
-      });
+      const shared = await shareCurrentBill(
+        () => latestSnapshot.current,
+        (message) => Share.share({ message, title: "DueShare · Bill split" }),
+      );
 
       // Only confirm success when the platform reports that the content was shared.
-      if (result.action === Share.sharedAction) {
+      if (shared) {
         navigate("SUCCESS");
       }
     } catch (error) {
       Alert.alert(
         "Could not share",
-        "An error occurred while opening the share sheet. Please try again.",
+        "Check that all amounts are valid and add up to the total, then try again.",
       );
     } finally {
+      sharingNow.current = false;
       setSharing(false);
     }
   };
@@ -95,9 +99,7 @@ export const ReviewScreen: React.FC = () => {
                 </View>
               </View>
 
-              <Text style={styles.shareAmount}>
-                ₹{share.formattedShare}
-              </Text>
+              <Text style={styles.shareAmount}>₹{share.formattedShare}</Text>
             </View>
           ))}
 
@@ -114,11 +116,17 @@ export const ReviewScreen: React.FC = () => {
 
       {/* Footer Actions */}
       <View style={styles.footer}>
+        {!canShare && (
+          <Text accessibilityRole="alert">
+            This split is not valid. Edit the amounts before sharing.
+          </Text>
+        )}
         <PrimaryButton
           title="Share Split"
           iconRight="↗"
           onPress={handleShare}
           loading={sharing}
+          disabled={!canShare || sharing}
           accessibilityLabel="Share bill split"
         />
 

@@ -112,7 +112,7 @@ export const SplitMethodScreen: React.FC = () => {
         <View style={styles.hintRow}>
           <Text style={styles.hintEmoji}>⚡</Text>
           <Text style={styles.hintText}>
-            Most people choose Equal split (takes 5s)
+            Equal divides the total. Custom lets you set exact amounts.
           </Text>
         </View>
       </ScrollView>

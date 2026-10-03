@@ -35,7 +35,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       accessible={true}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
-      accessibilityState={{ disabled: disabled || loading }}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={({ pressed }) => [
         styles.button,
         disabled && styles.disabled,
@@ -66,7 +66,8 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    height: 54,
+    minHeight: 54,
+    paddingVertical: SPACING.md,
     backgroundColor: COLORS.primary,
     borderRadius: RADIUS.lg,
     flexDirection: "row",
@@ -82,6 +83,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   text: {
+    flexShrink: 1,
+    textAlign: "center",
     ...TYPOGRAPHY.bodyMedium,
     color: "#FFFFFF",
     fontWeight: "600",

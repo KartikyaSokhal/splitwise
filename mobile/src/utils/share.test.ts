@@ -11,7 +11,7 @@ test("generates expected share text format matching prompt specification", () =>
   ]);
 
   const expected = [
-    "Bill split",
+    "DueShare · Bill split",
     "",
     "Total: ₹1240.00",
     "",

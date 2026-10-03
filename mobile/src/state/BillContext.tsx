@@ -11,7 +11,7 @@ import {
   ScreenName,
   SplitMethod,
 } from "../types/index.ts";
-import { formatMinorAsInr, parseInrToMinor } from "../utils/money.ts";
+import { formatMinorAsInr, isValidLabel, parseInrToMinor } from "../utils/money.ts";
 import {
   calculateEqualSplit,
   CustomSharesInput,
@@ -74,7 +74,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
   >({});
 
   const navigate = useCallback((nextScreen: ScreenName) => {
-    setScreenHistory((prev) => [...prev, nextScreen]);
+    setScreenHistory((prev) => nextScreen === "HOME" ? ["HOME"] : prev[prev.length - 1] === nextScreen ? prev : [...prev, nextScreen]);
   }, []);
 
   const goBack = useCallback(() => {
@@ -138,6 +138,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const addPerson = useCallback((name: string): boolean => {
+    if (!isValidLabel(name)) return false;
     const trimmed = name.trim();
     if (!trimmed) return false;
     const newPerson: Person = {
@@ -164,6 +165,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setSplitMethod = useCallback(
     (method: SplitMethod) => {
+      if (method === splitMethod) return; // A no-op selection must preserve edits and pins.
       setSplitMethodState(method);
       // If switching to custom, ensure each person has an entry and reset pinning
       if (method === "custom" && totalMinor !== null && people.length > 0) {
@@ -176,7 +178,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
         setCustomShares(next);
       }
     },
-    [totalMinor, people],
+    [totalMinor, people, splitMethod],
   );
 
   const setCustomShare = useCallback((personId: string, val: string) => {
@@ -188,7 +190,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const commitCustomShare = useCallback(
     (personId: string, explicitVal?: string) => {
-      if (totalMinor === null || people.length === 0) return;
+      if (totalMinor === null || !people.some((p) => p.id === personId)) return;
 
       const raw = explicitVal !== undefined ? explicitVal : (customShares[personId] ?? "");
       const trimmed = raw.trim();

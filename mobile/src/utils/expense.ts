@@ -1,4 +1,4 @@
-import { MoneyValidationError } from "./money.ts";
+import { isValidId, isValidLabel, MoneyValidationError } from "./money.ts";
 import type {
   Expense,
   ExpenseValidationIssue,
@@ -65,12 +65,37 @@ export function validateExpense(
     };
   }
 
-  // Currency validation
-  if (expense.currency !== "INR") {
+  // Runtime metadata/membership validation precedes every use of caller data.
+  if (
+    !isValidId(expense.id) ||
+    !isValidId(expense.groupId) ||
+    !isValidLabel(expense.description, 500)
+  ) {
     addIssue(
-      "INVALID_CURRENCY",
-      `Currency must be 'INR', got '${expense.currency}'.`,
+      "INVALID_METADATA",
+      "Expense id, groupId and description must be valid bounded text.",
     );
+  }
+  if (
+    !(
+      Array.isArray(validParticipantIds) || validParticipantIds instanceof Set
+    ) ||
+    [...validParticipantIds].some((id) => !isValidId(id))
+  ) {
+    addIssue(
+      "INVALID_PARTICIPANTS",
+      "Participants must be an array or Set of valid IDs.",
+    );
+    return { isValid: false, errors: issues.map((i) => i.message), issues };
+  }
+  if (
+    Array.isArray(validParticipantIds) &&
+    new Set(validParticipantIds).size !== validParticipantIds.length
+  ) {
+    addIssue("INVALID_PARTICIPANTS", "Participant IDs must be unique.");
+  }
+  if (expense.currency !== "INR") {
+    addIssue("INVALID_CURRENCY", "Currency must be 'INR'.");
   }
 
   // Total minor validation
@@ -82,7 +107,7 @@ export function validateExpense(
   if (!isTotalValidNumber) {
     addIssue(
       "INVALID_TOTAL",
-      `totalMinor must be a non-negative safe integer of paise, got ${expense.totalMinor}.`,
+      "totalMinor must be a non-negative safe integer of paise.",
     );
   }
 
@@ -96,7 +121,7 @@ export function validateExpense(
     addIssue("INVALID_PAYMENT_AMOUNT", "expense.payments must be an array.");
   } else {
     const seenPayers = new Set<string>();
-    let totalPaymentsMinor = 0;
+    let totalPaymentsMinor = 0n;
 
     for (const payment of expense.payments) {
       if (!payment || typeof payment !== "object") {
@@ -105,7 +130,7 @@ export function validateExpense(
       }
 
       const payerId = payment.payerId;
-      if (typeof payerId !== "string" || payerId.trim() === "") {
+      if (!isValidId(payerId)) {
         addIssue("EMPTY_ID", "Payment payerId must be a non-empty string.");
       } else {
         if (!validSet.has(payerId)) {
@@ -134,15 +159,18 @@ export function validateExpense(
       ) {
         addIssue(
           "INVALID_PAYMENT_AMOUNT",
-          `Payment amount for payer '${payerId}' must be a positive safe integer of paise (got ${amount}).`,
-          payerId,
+          "Payment amount must be a positive safe integer of paise.",
+          isValidId(payerId) ? payerId : undefined,
         );
       } else {
-        totalPaymentsMinor += amount;
+        totalPaymentsMinor += BigInt(amount);
       }
     }
 
-    if (isTotalValidNumber && totalPaymentsMinor !== expense.totalMinor) {
+    if (
+      isTotalValidNumber &&
+      totalPaymentsMinor !== BigInt(expense.totalMinor)
+    ) {
       addIssue(
         "PAYMENTS_SUM_MISMATCH",
         `Total payments (${totalPaymentsMinor} paise) must equal expense total (${expense.totalMinor} paise).`,
@@ -155,7 +183,7 @@ export function validateExpense(
     addIssue("INVALID_SHARE_AMOUNT", "expense.shares must be an array.");
   } else {
     const seenSharePersons = new Set<string>();
-    let totalSharesMinor = 0;
+    let totalSharesMinor = 0n;
 
     for (const share of expense.shares) {
       if (!share || typeof share !== "object") {
@@ -164,7 +192,7 @@ export function validateExpense(
       }
 
       const personId = share.personId;
-      if (typeof personId !== "string" || personId.trim() === "") {
+      if (!isValidId(personId)) {
         addIssue("EMPTY_ID", "Share personId must be a non-empty string.");
       } else {
         if (!validSet.has(personId)) {
@@ -193,15 +221,15 @@ export function validateExpense(
       ) {
         addIssue(
           "INVALID_SHARE_AMOUNT",
-          `Share amount for participant '${personId}' must be a non-negative safe integer of paise (got ${amount}).`,
-          personId,
+          "Share amount must be a non-negative safe integer of paise.",
+          isValidId(personId) ? personId : undefined,
         );
       } else {
-        totalSharesMinor += amount;
+        totalSharesMinor += BigInt(amount);
       }
     }
 
-    if (isTotalValidNumber && totalSharesMinor !== expense.totalMinor) {
+    if (isTotalValidNumber && totalSharesMinor !== BigInt(expense.totalMinor)) {
       addIssue(
         "SHARES_SUM_MISMATCH",
         `Total shares (${totalSharesMinor} paise) must equal expense total (${expense.totalMinor} paise).`,
@@ -251,6 +279,21 @@ export function calculateBalances(
   expense: Expense,
   participantOrder?: readonly string[],
 ): ParticipantBalance[] {
+  if (
+    !expense ||
+    typeof expense !== "object" ||
+    !Array.isArray(expense.payments) ||
+    !Array.isArray(expense.shares) ||
+    expense.payments.some((p) => !p || !isValidId(p.payerId)) ||
+    expense.shares.some((s) => !s || !isValidId(s.personId)) ||
+    (participantOrder !== undefined &&
+      (!Array.isArray(participantOrder) ||
+        participantOrder.some((id) => !isValidId(id))))
+  ) {
+    throw new ExpenseValidationError([
+      "Invalid expense or participant order shape.",
+    ]);
+  }
   const effectiveOrder =
     participantOrder ??
     Array.from(
@@ -308,8 +351,11 @@ export function calculateBalances(
   });
 
   // Verify conservation of money invariant (INV-B2)
-  const sumBalances = balances.reduce((sum, b) => sum + b.balanceMinor, 0);
-  if (sumBalances !== 0) {
+  const sumBalances = balances.reduce(
+    (sum, b) => sum + BigInt(b.balanceMinor),
+    0n,
+  );
+  if (sumBalances !== 0n) {
     throw new ExpenseValidationError([
       `Balance conservation invariant violated: sum(balances) = ${sumBalances}, expected 0.`,
     ]);
@@ -319,7 +365,7 @@ export function calculateBalances(
 }
 
 /**
- * Helper factory to create a strongly-typed Expense object with optional validation.
+ * Validated factory; optional membership context is not authorization.
  */
 export function createExpense(
   params: {
@@ -333,19 +379,34 @@ export function createExpense(
   },
   validParticipantIds?: readonly string[] | ReadonlySet<string>,
 ): Expense {
+  if (
+    !params ||
+    typeof params !== "object" ||
+    !Array.isArray(params.payments) ||
+    !Array.isArray(params.shares)
+  ) {
+    throw new ExpenseValidationError(["Invalid expense input."]);
+  }
   const expense: Expense = {
     id: params.id,
     groupId: params.groupId,
     description: params.description,
     totalMinor: params.totalMinor,
-    currency: params.currency ?? "INR",
+    currency: params.currency === undefined ? "INR" : params.currency,
     payments: params.payments,
     shares: params.shares,
   };
 
-  if (validParticipantIds) {
+  // Validate even without external membership context; that context is NOT authorization.
+  if (validParticipantIds !== undefined)
     assertValidExpense(expense, validParticipantIds);
-  }
-
-  return expense;
+  calculateBalances(
+    expense,
+    validParticipantIds !== undefined ? [...validParticipantIds] : undefined,
+  );
+  return {
+    ...expense,
+    payments: expense.payments.map((p) => ({ ...p })),
+    shares: expense.shares.map((s) => ({ ...s })),
+  };
 }

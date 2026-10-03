@@ -1,4 +1,4 @@
-import { assertMinorAmount, MoneyValidationError } from "./money.ts";
+import { assertMinorAmount, isValidId, MoneyValidationError } from "./money.ts";
 
 export type SplitParticipant = {
   id: string;
@@ -16,19 +16,19 @@ export type CustomSplitReconciliation = {
   isReconciled: boolean;
 };
 
-function assertParticipants(
-  participants: readonly SplitParticipant[],
-): void {
-  if (participants.length === 0) {
+function assertParticipants(participants: readonly SplitParticipant[]): void {
+  if (!Array.isArray(participants) || participants.length === 0) {
     throw new MoneyValidationError("At least one person is required.");
   }
 
   const ids = new Set<string>();
   for (const participant of participants) {
     if (typeof participant !== "object" || participant === null) {
-      throw new MoneyValidationError("Each person must be an object with an id.");
+      throw new MoneyValidationError(
+        "Each person must be an object with an id.",
+      );
     }
-    if (typeof participant.id !== "string" || participant.id.trim() === "") {
+    if (!isValidId(participant.id)) {
       throw new MoneyValidationError("Each person must have a non-empty id.");
     }
     if (ids.has(participant.id)) {
@@ -39,7 +39,7 @@ function assertParticipants(
 }
 
 function assertCustomShares(shares: readonly SplitShare[]): void {
-  if (shares.length === 0) {
+  if (!Array.isArray(shares) || shares.length === 0) {
     throw new MoneyValidationError("At least one custom share is required.");
   }
 
@@ -50,13 +50,15 @@ function assertCustomShares(shares: readonly SplitShare[]): void {
         "Each custom share must be an object with a person id and amount.",
       );
     }
-    if (typeof share.personId !== "string" || share.personId.trim() === "") {
+    if (!isValidId(share.personId)) {
       throw new MoneyValidationError(
         "Each custom share must have a non-empty person id.",
       );
     }
     if (ids.has(share.personId)) {
-      throw new MoneyValidationError("Each custom share person id must be unique.");
+      throw new MoneyValidationError(
+        "Each custom share person id must be unique.",
+      );
     }
     ids.add(share.personId);
     assertMinorAmount(share.shareMinor, "custom share");
@@ -162,6 +164,9 @@ export function redistributeWithPinning(
   assertCustomShares(shares);
 
   const pinnedShares = shares.filter((s) => s.isPinned);
+  if (shares.some((s) => typeof s.isPinned !== "boolean")) {
+    throw new MoneyValidationError("Every pin must be a boolean.");
+  }
   const unpinnedShares = shares.filter((s) => !s.isPinned);
 
   const pinnedTotalMinor = pinnedShares.reduce(

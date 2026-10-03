@@ -1,4 +1,4 @@
-import { MoneyValidationError } from "./money.ts";
+import { isValidId, MoneyValidationError } from "./money.ts";
 import type { ParticipantBalance } from "../types/expense.ts";
 import type { SuggestedTransfer } from "../types/settlement.ts";
 
@@ -46,14 +46,16 @@ export function suggestSettlements(
 
   // Precondition checks: safe integer paise and unique person IDs
   const seenPersonIds = new Set<string>();
-  let sumBalances = 0;
+  let sumBalances = 0n;
 
   for (const b of balances) {
     if (!b || typeof b !== "object") {
-      throw new SettlementValidationError("Each balance entry must be an object.");
+      throw new SettlementValidationError(
+        "Each balance entry must be an object.",
+      );
     }
 
-    if (typeof b.personId !== "string" || b.personId.trim() === "") {
+    if (!isValidId(b.personId)) {
       throw new SettlementValidationError(
         "Each balance entry must have a non-empty personId.",
       );
@@ -75,11 +77,11 @@ export function suggestSettlements(
       );
     }
 
-    sumBalances += b.balanceMinor;
+    sumBalances += BigInt(b.balanceMinor);
   }
 
   // Enforce conservation of money invariant INV-B2
-  if (sumBalances !== 0) {
+  if (sumBalances !== 0n) {
     throw new SettlementValidationError(
       `Balance conservation invariant violated: sum(balances) = ${sumBalances}, expected 0.`,
     );
@@ -146,5 +148,12 @@ export function suggestSettlements(
     }
   }
 
+  // Defense in depth: no successful result may leave either partition unsettled.
+  if (
+    debtors.some((p) => p.amountMinor !== 0) ||
+    creditors.some((p) => p.amountMinor !== 0)
+  ) {
+    throw new SettlementValidationError("Settlement left a non-zero residual.");
+  }
   return transfers;
 }

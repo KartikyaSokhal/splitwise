@@ -55,7 +55,8 @@ export const SecondaryButton: React.FC<SecondaryButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    height: 54,
+    minHeight: 54,
+    paddingVertical: SPACING.md,
     backgroundColor: COLORS.surface,
     borderColor: COLORS.border,
     borderWidth: 1,
@@ -76,6 +77,8 @@ const styles = StyleSheet.create({
     marginRight: SPACING.sm,
   },
   text: {
+    flexShrink: 1,
+    textAlign: "center",
     ...TYPOGRAPHY.bodyMedium,
     color: COLORS.textPrimary,
     fontWeight: "600",

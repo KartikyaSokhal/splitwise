@@ -116,7 +116,7 @@ export const CustomSplitScreen: React.FC = () => {
               isYou={person.isYou}
               value={val}
               onChangeValue={(newVal) => setCustomShare(person.id, newVal)}
-              onCommitValue={() => commitCustomShare(person.id)}
+              onCommitValue={(text) => commitCustomShare(person.id, text)}
               isPinned={isPinned}
               onTogglePin={() => {
                 if (isPinned) {

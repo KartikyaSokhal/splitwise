@@ -20,8 +20,8 @@ export const SuccessScreen: React.FC = () => {
           <Text style={styles.checkIcon}>✓</Text>
         </View>
 
-        <Text style={styles.title}>Split shared</Text>
-        <Text style={styles.subtitle}>Your bill split is ready.</Text>
+        <Text style={styles.title}>Split ready</Text>
+        <Text style={styles.subtitle}>Check your chosen app to confirm delivery.</Text>
       </View>
 
       {/* Actions */}
@@ -93,6 +93,6 @@ const styles = StyleSheet.create({
   homeBtn: {
     borderWidth: 0,
     backgroundColor: "transparent",
-    height: 48,
+    minHeight: 48,
   },
 });
