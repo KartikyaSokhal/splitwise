@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Split",
+    "name": "DueShare",
     "slug": "split",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,7 +12,10 @@
       "supportsTablet": true
     },
     "plugins": [
-      "expo-asset"
+      "expo-asset",
+      "expo-secure-store",
+      "expo-web-browser",
+      "@react-native-community/datetimepicker"
     ]
   }
 }

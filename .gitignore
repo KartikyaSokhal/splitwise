@@ -7,11 +7,16 @@ node_modules/
 dist/
 web-build/
 coverage/
+mobile/ios/
+mobile/android/
 
 # Local environment and logs
 .env
 .env.*
+.env copy*
 !.env.example
+supabase/.temp/
+supabase/.branches/
 *.log
 npm-debug.*
 yarn-debug.log*
