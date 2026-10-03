@@ -31,3 +31,5 @@ export type SplitCalculationResult = {
   isReconciled: boolean;
   remainingMinor?: number;
 };
+
+export * from "./expense.ts";
