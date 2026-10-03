@@ -33,3 +33,4 @@ export type SplitCalculationResult = {
 };
 
 export * from "./expense.ts";
+export * from "./settlement.ts";
