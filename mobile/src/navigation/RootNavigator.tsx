@@ -8,6 +8,8 @@ import { SplitMethodScreen } from "../screens/SplitMethodScreen.tsx";
 import { CustomSplitScreen } from "../screens/CustomSplitScreen.tsx";
 import { ReviewScreen } from "../screens/ReviewScreen.tsx";
 import { SuccessScreen } from "../screens/SuccessScreen.tsx";
+import { AccountScreen } from "../screens/AccountScreen.tsx";
+import { CloudNavigator } from "./CloudNavigator.tsx";
 
 export const RootNavigator: React.FC = () => {
   const { currentScreen, canGoBack, goBack } = useBill();
@@ -15,6 +17,7 @@ export const RootNavigator: React.FC = () => {
   // Android hardware back button handler
   useEffect(() => {
     const onBackPress = () => {
+      // Nested signed-in navigation installs its own last-registered handler.
       if (canGoBack) {
         goBack();
         return true;
@@ -30,6 +33,12 @@ export const RootNavigator: React.FC = () => {
   }, [canGoBack, goBack]);
 
   switch (currentScreen) {
+    case "GROUPS":
+      return <CloudNavigator initial="groups" />;
+    case "HISTORY":
+      return <CloudNavigator initial="history" />;
+    case "ACCOUNT":
+      return <AccountScreen />;
     case "HOME":
       return <HomeScreen />;
     case "ENTER_TOTAL":
