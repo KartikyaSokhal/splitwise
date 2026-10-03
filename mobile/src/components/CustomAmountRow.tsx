@@ -3,6 +3,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
@@ -13,6 +14,9 @@ export type CustomAmountRowProps = {
   isYou?: boolean;
   value: string;
   onChangeValue: (val: string) => void;
+  onCommitValue?: () => void;
+  isPinned?: boolean;
+  onTogglePin?: () => void;
   percentOfTotal?: number;
 };
 
@@ -21,6 +25,9 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
   isYou = false,
   value,
   onChangeValue,
+  onCommitValue,
+  isPinned = false,
+  onTogglePin,
   percentOfTotal,
 }) => {
   return (
@@ -37,6 +44,22 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
               <Text style={styles.youText}>You</Text>
             </View>
           ) : null}
+          {isPinned ? (
+            <TouchableOpacity
+              onPress={onTogglePin}
+              style={styles.pinnedBadge}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`Unpin ${name}'s amount`}
+              accessibilityHint="Unpins this participant and redistributes their share"
+            >
+              <Text style={styles.pinnedBadgeText}>🔒 Edited</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.autoBadge}>
+              <Text style={styles.autoBadgeText}>⚡ Auto</Text>
+            </View>
+          )}
         </View>
         <Text style={styles.percentText}>
           {percentOfTotal !== undefined && !Number.isNaN(percentOfTotal)
@@ -45,11 +68,26 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
         </Text>
       </View>
 
-      <View style={styles.inputWrapper}>
-        <Text style={styles.currencyPrefix}>₹</Text>
+      <View
+        style={[
+          styles.inputWrapper,
+          isPinned ? styles.inputWrapperPinned : null,
+        ]}
+      >
+        <Text
+          style={[
+            styles.currencyPrefix,
+            isPinned ? styles.currencyPrefixPinned : null,
+          ]}
+        >
+          ₹
+        </Text>
         <TextInput
           value={value}
           onChangeText={onChangeValue}
+          onBlur={onCommitValue}
+          onSubmitEditing={onCommitValue}
+          returnKeyType="done"
           keyboardType="numeric"
           placeholder="0"
           placeholderTextColor={COLORS.textMuted}
@@ -122,11 +160,18 @@ const styles = StyleSheet.create({
     minWidth: 110,
     height: 44,
   },
+  inputWrapperPinned: {
+    backgroundColor: "#FFFBEB",
+    borderColor: "#F59E0B",
+  },
   currencyPrefix: {
     fontSize: 16,
     fontWeight: "600",
     color: COLORS.primary,
     marginRight: 4,
+  },
+  currencyPrefixPinned: {
+    color: COLORS.warningText,
   },
   input: {
     ...TYPOGRAPHY.bodyMedium,
@@ -136,5 +181,35 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     textAlign: "right",
     padding: 0,
+  },
+  pinnedBadge: {
+    backgroundColor: COLORS.warningLight,
+    borderWidth: 1,
+    borderColor: "#FDE68A",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+    marginLeft: SPACING.sm,
+  },
+  pinnedBadgeText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.warningText,
+    fontWeight: "700",
+    fontSize: 11,
+  },
+  autoBadge: {
+    backgroundColor: COLORS.primarySubtle,
+    borderWidth: 1,
+    borderColor: COLORS.borderSubtle,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+    marginLeft: SPACING.sm,
+  },
+  autoBadgeText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textSecondary,
+    fontWeight: "600",
+    fontSize: 11,
   },
 });

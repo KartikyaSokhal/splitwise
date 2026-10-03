@@ -11,11 +11,12 @@ import {
   ScreenName,
   SplitMethod,
 } from "../types/index.ts";
-import { parseInrToMinor } from "../utils/money.ts";
+import { formatMinorAsInr, parseInrToMinor } from "../utils/money.ts";
 import {
   calculateEqualSplit,
   CustomSharesInput,
   evaluateCustomSplit,
+  redistributeCustomShares,
 } from "./splitLogic.ts";
 import type { CustomSplitReconciliation } from "../utils/split.ts";
 
@@ -42,6 +43,10 @@ export type BillContextType = {
 
   customShares: CustomSharesInput;
   setCustomShare: (personId: string, val: string) => void;
+  commitCustomShare: (personId: string, explicitVal?: string) => void;
+  unpinCustomShare: (personId: string) => void;
+  pinnedParticipantIds: Record<string, boolean>;
+  resetToEqual: () => void;
 
   calculatedShares: PersonShareResult[];
   customReconciliation: CustomSplitReconciliation | null;
@@ -64,6 +69,9 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
   const [people, setPeople] = useState<Person[]>([]);
   const [splitMethod, setSplitMethodState] = useState<SplitMethod>("equal");
   const [customShares, setCustomShares] = useState<CustomSharesInput>({});
+  const [pinnedParticipantIds, setPinnedParticipantIds] = useState<
+    Record<string, boolean>
+  >({});
 
   const navigate = useCallback((nextScreen: ScreenName) => {
     setScreenHistory((prev) => [...prev, nextScreen]);
@@ -147,23 +155,25 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
       delete next[id];
       return next;
     });
+    setPinnedParticipantIds((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
   }, []);
 
   const setSplitMethod = useCallback(
     (method: SplitMethod) => {
       setSplitMethodState(method);
-      // If switching to custom, ensure each person has an entry
+      // If switching to custom, ensure each person has an entry and reset pinning
       if (method === "custom" && totalMinor !== null && people.length > 0) {
+        setPinnedParticipantIds({});
         const equalShares = calculateEqualSplit(totalMinor, people);
-        setCustomShares((prev) => {
-          const next: CustomSharesInput = { ...prev };
-          for (const s of equalShares) {
-            if (next[s.personId] === undefined) {
-              next[s.personId] = s.formattedShare;
-            }
-          }
-          return next;
-        });
+        const next: CustomSharesInput = {};
+        for (const s of equalShares) {
+          next[s.personId] = s.formattedShare;
+        }
+        setCustomShares(next);
       }
     },
     [totalMinor, people],
@@ -176,6 +186,74 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
     }));
   }, []);
 
+  const commitCustomShare = useCallback(
+    (personId: string, explicitVal?: string) => {
+      if (totalMinor === null || people.length === 0) return;
+
+      const raw = explicitVal !== undefined ? explicitVal : (customShares[personId] ?? "");
+      const trimmed = raw.trim();
+      let committedMinor: number;
+      try {
+        committedMinor = trimmed === "" ? 0 : parseInrToMinor(trimmed);
+      } catch {
+        // Invalid format - do not pin or redistribute
+        return;
+      }
+
+      const nextPinned: Record<string, boolean> = {
+        ...pinnedParticipantIds,
+        [personId]: true,
+      };
+
+      const updatedInputs: CustomSharesInput = {
+        ...customShares,
+        [personId]: formatMinorAsInr(committedMinor),
+      };
+
+      const { newInputs } = redistributeCustomShares(
+        totalMinor,
+        people,
+        updatedInputs,
+        nextPinned,
+      );
+
+      setPinnedParticipantIds(nextPinned);
+      setCustomShares(newInputs);
+    },
+    [totalMinor, people, customShares, pinnedParticipantIds],
+  );
+
+  const unpinCustomShare = useCallback(
+    (personId: string) => {
+      if (totalMinor === null || people.length === 0) return;
+
+      const nextPinned: Record<string, boolean> = { ...pinnedParticipantIds };
+      delete nextPinned[personId];
+
+      const { newInputs } = redistributeCustomShares(
+        totalMinor,
+        people,
+        customShares,
+        nextPinned,
+      );
+
+      setPinnedParticipantIds(nextPinned);
+      setCustomShares(newInputs);
+    },
+    [totalMinor, people, customShares, pinnedParticipantIds],
+  );
+
+  const resetToEqual = useCallback(() => {
+    if (totalMinor === null || people.length === 0) return;
+    setPinnedParticipantIds({});
+    const equalShares = calculateEqualSplit(totalMinor, people);
+    const next: CustomSharesInput = {};
+    for (const s of equalShares) {
+      next[s.personId] = s.formattedShare;
+    }
+    setCustomShares(next);
+  }, [totalMinor, people]);
+
   // Split calculation results
   const customEvaluation = useMemo(() => {
     if (totalMinor === null || people.length === 0) {
@@ -185,8 +263,13 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
         shares: [],
       };
     }
-    return evaluateCustomSplit(totalMinor, people, customShares);
-  }, [totalMinor, people, customShares]);
+    return evaluateCustomSplit(
+      totalMinor,
+      people,
+      customShares,
+      pinnedParticipantIds,
+    );
+  }, [totalMinor, people, customShares, pinnedParticipantIds]);
 
   const equalShares = useMemo(() => {
     if (totalMinor === null || people.length === 0) return [];
@@ -209,6 +292,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
     setPeople([]);
     setSplitMethodState("equal");
     setCustomShares({});
+    setPinnedParticipantIds({});
     setScreenHistory(["HOME"]);
   }, []);
 
@@ -217,6 +301,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
     setPeople([]);
     setSplitMethodState("equal");
     setCustomShares({});
+    setPinnedParticipantIds({});
     setScreenHistory(["HOME", "ENTER_TOTAL"]);
   }, []);
 
@@ -240,6 +325,10 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
       setSplitMethod,
       customShares,
       setCustomShare,
+      commitCustomShare,
+      unpinCustomShare,
+      pinnedParticipantIds,
+      resetToEqual,
       calculatedShares,
       customReconciliation,
       customHasInvalidFormat,
@@ -266,6 +355,10 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
       setSplitMethod,
       customShares,
       setCustomShare,
+      commitCustomShare,
+      unpinCustomShare,
+      pinnedParticipantIds,
+      resetToEqual,
       calculatedShares,
       customReconciliation,
       customHasInvalidFormat,
