@@ -1,0 +1,16 @@
+{
+  "name": "split-database-tests",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=26.5.0 <27"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "test:postgres": "node --test tests/postgres.integration.mjs",
+    "test:staging-anonymous": "node tests/staging-anonymous.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8"
+  }
+}
