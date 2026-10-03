@@ -1,9 +1,12 @@
 import { formatMinorAsInr, parseInrToMinor } from "../utils/money.ts";
 import {
   reconcileCustomSplit,
+  redistributeWithPinning,
   splitCustom,
   splitEqually,
   type CustomSplitReconciliation,
+  type PinnedSplitShare,
+  type PinningRedistributionResult,
   type SplitParticipant,
   type SplitShare,
 } from "../utils/split.ts";
@@ -57,10 +60,40 @@ export function parseCustomShares(
   return { shares, hasInvalidFormat };
 }
 
+export function parsePinnedCustomShares(
+  people: readonly Person[],
+  inputs: CustomSharesInput,
+  pinnedIds: Record<string, boolean> = {},
+): { shares: PinnedSplitShare[]; hasInvalidFormat: boolean } {
+  let hasInvalidFormat = false;
+  const shares: PinnedSplitShare[] = [];
+
+  for (const person of people) {
+    const raw = inputs[person.id] ?? "0";
+    const trimmed = raw.trim();
+    const isPinned = Boolean(pinnedIds[person.id]);
+
+    if (trimmed === "") {
+      shares.push({ personId: person.id, shareMinor: 0, isPinned });
+      continue;
+    }
+    try {
+      const minor = parseInrToMinor(trimmed);
+      shares.push({ personId: person.id, shareMinor: minor, isPinned });
+    } catch {
+      hasInvalidFormat = true;
+      shares.push({ personId: person.id, shareMinor: 0, isPinned });
+    }
+  }
+
+  return { shares, hasInvalidFormat };
+}
+
 export function evaluateCustomSplit(
   totalMinor: number,
   people: readonly Person[],
   inputs: CustomSharesInput,
+  pinnedIds?: Record<string, boolean>,
 ): {
   reconciliation: CustomSplitReconciliation | null;
   hasInvalidFormat: boolean;
@@ -94,6 +127,7 @@ export function evaluateCustomSplit(
       isYou: person?.isYou,
       shareMinor: s.shareMinor,
       formattedShare: formatMinorAsInr(s.shareMinor),
+      isPinned: Boolean(pinnedIds?.[s.personId]),
     };
   });
 
@@ -101,5 +135,53 @@ export function evaluateCustomSplit(
     reconciliation,
     hasInvalidFormat,
     shares,
+  };
+}
+
+export function redistributeCustomShares(
+  totalMinor: number,
+  people: readonly Person[],
+  inputs: CustomSharesInput,
+  pinnedIds: Record<string, boolean>,
+): {
+  newInputs: CustomSharesInput;
+  redistribution: PinningRedistributionResult;
+  hasInvalidFormat: boolean;
+} {
+  const { shares, hasInvalidFormat } = parsePinnedCustomShares(
+    people,
+    inputs,
+    pinnedIds,
+  );
+
+  if (hasInvalidFormat) {
+    return {
+      newInputs: { ...inputs },
+      redistribution: {
+        shares,
+        isValid: false,
+        pinnedTotalMinor: 0,
+        remainingMinor: totalMinor,
+        error: "Invalid amount format.",
+      },
+      hasInvalidFormat: true,
+    };
+  }
+
+  const redistribution = redistributeWithPinning(totalMinor, shares);
+  const newInputs: CustomSharesInput = { ...inputs };
+
+  if (redistribution.isValid) {
+    for (const share of redistribution.shares) {
+      if (!share.isPinned) {
+        newInputs[share.personId] = formatMinorAsInr(share.shareMinor);
+      }
+    }
+  }
+
+  return {
+    newInputs,
+    redistribution,
+    hasInvalidFormat: false,
   };
 }

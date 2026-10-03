@@ -21,6 +21,7 @@ export type PersonShareResult = {
   shareMinor: number;
   formattedShare: string;
   isYou?: boolean;
+  isPinned?: boolean;
 };
 
 export type SplitCalculationResult = {

@@ -5,6 +5,7 @@ import {
   calculateEqualSplit,
   evaluateCustomSplit,
   parseCustomShares,
+  redistributeCustomShares,
 } from "../state/splitLogic.ts";
 import { formatMinorAsInr, parseInrToMinor } from "../utils/money.ts";
 import { generateShareText } from "../utils/share.ts";
@@ -117,6 +118,73 @@ test("Test 8: Continuing with no people is rejected", () => {
   const customResult = evaluateCustomSplit(totalMinor, emptyPeople, {});
   assert.equal(customResult.reconciliation, null);
   assert.equal(customResult.shares.length, 0);
+});
+
+test("Test 9: Complete custom split pinning flow (pin, redistribute, unpin, reset)", () => {
+  const totalMinor = parseInrToMinor("1000"); // 100000 paise
+  const equalShares = calculateEqualSplit(totalMinor, threePeople);
+  let inputs: Record<string, string> = {};
+  for (const s of equalShares) {
+    inputs[s.personId] = s.formattedShare;
+  }
+  let pinnedIds: Record<string, boolean> = {};
+
+  // 1. Initially unpinned
+  assert.equal(inputs["1"], "333.34");
+  assert.equal(inputs["2"], "333.33");
+  assert.equal(inputs["3"], "333.33");
+
+  // 2. Commit edit for person "1" to 400.00
+  inputs["1"] = "400.00";
+  pinnedIds["1"] = true;
+  const step1 = redistributeCustomShares(totalMinor, threePeople, inputs, pinnedIds);
+  assert.equal(step1.redistribution.isValid, true);
+  inputs = step1.newInputs;
+  assert.equal(inputs["1"], "400.00");
+  assert.equal(inputs["2"], "300.00");
+  assert.equal(inputs["3"], "300.00");
+
+  const eval1 = evaluateCustomSplit(totalMinor, threePeople, inputs, pinnedIds);
+  assert.equal(eval1.reconciliation?.isReconciled, true);
+  assert.equal(eval1.shares[0].isPinned, true);
+  assert.equal(eval1.shares[1].isPinned, false);
+  assert.equal(eval1.shares[2].isPinned, false);
+
+  // 3. Commit edit for person "2" to 350.00
+  inputs["2"] = "350.00";
+  pinnedIds["2"] = true;
+  const step2 = redistributeCustomShares(totalMinor, threePeople, inputs, pinnedIds);
+  assert.equal(step2.redistribution.isValid, true);
+  inputs = step2.newInputs;
+  assert.equal(inputs["1"], "400.00");
+  assert.equal(inputs["2"], "350.00");
+  assert.equal(inputs["3"], "250.00");
+
+  const eval2 = evaluateCustomSplit(totalMinor, threePeople, inputs, pinnedIds);
+  assert.equal(eval2.reconciliation?.isReconciled, true);
+  assert.equal(eval2.shares[0].isPinned, true);
+  assert.equal(eval2.shares[1].isPinned, true);
+  assert.equal(eval2.shares[2].isPinned, false);
+
+  // 4. Unpin person "2"
+  delete pinnedIds["2"];
+  const step3 = redistributeCustomShares(totalMinor, threePeople, inputs, pinnedIds);
+  assert.equal(step3.redistribution.isValid, true);
+  inputs = step3.newInputs;
+  assert.equal(inputs["1"], "400.00");
+  assert.equal(inputs["2"], "300.00");
+  assert.equal(inputs["3"], "300.00");
+
+  // 5. Reset to equal
+  pinnedIds = {};
+  const equalAgain = calculateEqualSplit(totalMinor, threePeople);
+  inputs = {};
+  for (const s of equalAgain) {
+    inputs[s.personId] = s.formattedShare;
+  }
+  assert.equal(inputs["1"], "333.34");
+  assert.equal(inputs["2"], "333.33");
+  assert.equal(inputs["3"], "333.33");
 });
 
 test("Test 10: Complete flow share text summary generation", () => {

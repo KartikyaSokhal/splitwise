@@ -136,3 +136,96 @@ export function sumSharesMinor(shares: readonly SplitShare[]): number {
   assertMinorAmount(totalMinor, "sum of shares");
   return totalMinor;
 }
+
+export type PinnedSplitShare = SplitShare & {
+  isPinned: boolean;
+};
+
+export type PinningRedistributionResult = {
+  shares: PinnedSplitShare[];
+  isValid: boolean;
+  pinnedTotalMinor: number;
+  remainingMinor: number;
+  error?: string;
+};
+
+/**
+ * Redistributes remaining paise across unpinned participants when custom shares are edited.
+ * Pinned shares remain fixed. Unpinned shares receive equal distribution of (total - pinnedTotal)
+ * using deterministic remainder logic in stable order.
+ */
+export function redistributeWithPinning(
+  totalMinor: number,
+  shares: readonly PinnedSplitShare[],
+): PinningRedistributionResult {
+  assertMinorAmount(totalMinor, "total");
+  assertCustomShares(shares);
+
+  const pinnedShares = shares.filter((s) => s.isPinned);
+  const unpinnedShares = shares.filter((s) => !s.isPinned);
+
+  const pinnedTotalMinor = pinnedShares.reduce(
+    (sum, s) => sum + s.shareMinor,
+    0,
+  );
+
+  if (!Number.isSafeInteger(pinnedTotalMinor)) {
+    throw new MoneyValidationError("Pinned shares total is too large.");
+  }
+
+  const remainingMinor = totalMinor - pinnedTotalMinor;
+
+  // Case 1: Pinned amounts exceed total
+  if (remainingMinor < 0) {
+    return {
+      shares: shares.map((s) => ({ ...s })),
+      isValid: false,
+      pinnedTotalMinor,
+      remainingMinor,
+      error: "Pinned amounts exceed total.",
+    };
+  }
+
+  // Case 2: All participants are pinned
+  if (unpinnedShares.length === 0) {
+    if (remainingMinor !== 0) {
+      return {
+        shares: shares.map((s) => ({ ...s })),
+        isValid: false,
+        pinnedTotalMinor,
+        remainingMinor,
+        error: "All shares are pinned but do not sum to total.",
+      };
+    }
+    return {
+      shares: shares.map((s) => ({ ...s })),
+      isValid: true,
+      pinnedTotalMinor,
+      remainingMinor: 0,
+    };
+  }
+
+  // Case 3: Distribute remainingMinor equally among unpinned participants
+  const base = Math.floor(remainingMinor / unpinnedShares.length);
+  const remainder = remainingMinor % unpinnedShares.length;
+
+  let unpinnedIndex = 0;
+  const resultShares = shares.map((share) => {
+    if (share.isPinned) {
+      return { ...share };
+    }
+    const shareMinor = base + (unpinnedIndex < remainder ? 1 : 0);
+    unpinnedIndex += 1;
+    return {
+      ...share,
+      shareMinor,
+    };
+  });
+
+  return {
+    shares: resultShares,
+    isValid: true,
+    pinnedTotalMinor,
+    remainingMinor: 0,
+  };
+}

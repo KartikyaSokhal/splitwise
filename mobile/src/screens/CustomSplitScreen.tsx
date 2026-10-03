@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
@@ -21,6 +22,10 @@ export const CustomSplitScreen: React.FC = () => {
     people,
     customShares,
     setCustomShare,
+    commitCustomShare,
+    unpinCustomShare,
+    pinnedParticipantIds,
+    resetToEqual,
     customReconciliation,
     customHasInvalidFormat,
     isCustomReconciled,
@@ -77,9 +82,23 @@ export const CustomSplitScreen: React.FC = () => {
           </View>
         </View>
 
+        {/* Action Bar with Reset */}
+        <View style={styles.actionsBar}>
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={resetToEqual}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Reset to equal split"
+          >
+            <Text style={styles.resetButtonText}>↺ Reset to Equal</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* People Custom Amount List */}
         {people.map((person) => {
           const val = customShares[person.id] ?? "";
+          const isPinned = Boolean(pinnedParticipantIds[person.id]);
           let percent = 0;
           if (totalMinor !== null && totalMinor > 0 && val.trim() !== "") {
             try {
@@ -97,13 +116,22 @@ export const CustomSplitScreen: React.FC = () => {
               isYou={person.isYou}
               value={val}
               onChangeValue={(newVal) => setCustomShare(person.id, newVal)}
+              onCommitValue={() => commitCustomShare(person.id)}
+              isPinned={isPinned}
+              onTogglePin={() => {
+                if (isPinned) {
+                  unpinCustomShare(person.id);
+                } else {
+                  commitCustomShare(person.id);
+                }
+              }}
               percentOfTotal={percent}
             />
           );
         })}
 
         <Text style={styles.hintText}>
-          👆 Tap any number to adjust
+          👆 Tap amount to edit & pin • Tap 🔒 to unpin
         </Text>
       </ScrollView>
 
@@ -155,7 +183,27 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: "row",
     gap: SPACING.md,
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.sm,
+  },
+  actionsBar: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: SPACING.md,
+  },
+  resetButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 6,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  resetButtonText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.primary,
+    fontWeight: "700",
   },
   statCard: {
     flex: 1,
