@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { formatMinorAsInr } from "../utils/money.ts";
+import {
+  SafeAnimated,
+  SafeEasing,
+  USE_NATIVE_DRIVER,
+  useReducedMotion,
+  hasNativeAnimated,
+} from "../utils/motion.ts";
 
 export type ReconciliationBannerProps = {
   totalMinor: number;
@@ -18,9 +25,42 @@ export const ReconciliationBanner: React.FC<ReconciliationBannerProps> = ({
   isReconciled,
   hasInvalidFormat = false,
 }) => {
+  const reduceMotion = useReducedMotion();
+  const isOver = remainingMinor < 0;
+  const statusKey = hasInvalidFormat
+    ? "invalid"
+    : isReconciled
+      ? "reconciled"
+      : isOver
+        ? "over"
+        : "remaining";
+  const prevStatusRef = useRef(statusKey);
+  const fadeAnim = useRef(new SafeAnimated.Value(1)).current;
+
+  useEffect(() => {
+    if (prevStatusRef.current !== statusKey) {
+      prevStatusRef.current = statusKey;
+      if (!reduceMotion && hasNativeAnimated) {
+        fadeAnim.setValue(0.75);
+        SafeAnimated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 160,
+          easing: SafeEasing.out(SafeEasing.cubic),
+          useNativeDriver: USE_NATIVE_DRIVER,
+        }).start();
+      }
+    }
+  }, [statusKey, reduceMotion, fadeAnim]);
+
   if (hasInvalidFormat) {
     return (
-      <View style={[styles.container, styles.errorContainer]}>
+      <SafeAnimated.View
+        style={[
+          styles.container,
+          styles.errorContainer,
+          { opacity: fadeAnim },
+        ]}
+      >
         <View style={styles.left}>
           <Text style={styles.errorIcon}>⚠️</Text>
           <Text style={styles.errorText}>Invalid amount format</Text>
@@ -28,13 +68,19 @@ export const ReconciliationBanner: React.FC<ReconciliationBannerProps> = ({
         <Text style={styles.ratioText}>
           ₹{formatMinorAsInr(Math.max(0, allocatedMinor))} / ₹{formatMinorAsInr(totalMinor)}
         </Text>
-      </View>
+      </SafeAnimated.View>
     );
   }
 
   if (isReconciled) {
     return (
-      <View style={[styles.container, styles.successContainer]}>
+      <SafeAnimated.View
+        style={[
+          styles.container,
+          styles.successContainer,
+          { opacity: fadeAnim },
+        ]}
+      >
         <View style={styles.left}>
           <View style={styles.checkCircle}>
             <Text style={styles.checkIcon}>✓</Text>
@@ -46,22 +92,22 @@ export const ReconciliationBanner: React.FC<ReconciliationBannerProps> = ({
             ₹{formatMinorAsInr(totalMinor)} / ₹{formatMinorAsInr(totalMinor)}
           </Text>
         </View>
-      </View>
+      </SafeAnimated.View>
     );
   }
 
   // Under-allocated: positive remainingMinor => "₹X remaining"
   // Over-allocated: negative remainingMinor => "₹X over"
-  const isOver = remainingMinor < 0;
   const diffAbsMinor = Math.abs(remainingMinor);
   const diffFormatted = formatMinorAsInr(diffAbsMinor);
   const statusMessage = isOver ? `₹${diffFormatted} over` : `₹${diffFormatted} remaining`;
 
   return (
-    <View
+    <SafeAnimated.View
       style={[
         styles.container,
         isOver ? styles.errorContainer : styles.warningContainer,
+        { opacity: fadeAnim },
       ]}
       accessible={true}
       accessibilityRole="alert"
@@ -79,7 +125,7 @@ export const ReconciliationBanner: React.FC<ReconciliationBannerProps> = ({
           ₹{formatMinorAsInr(Math.max(0, allocatedMinor))} / ₹{formatMinorAsInr(totalMinor)}
         </Text>
       </View>
-    </View>
+    </SafeAnimated.View>
   );
 };
 

@@ -1,8 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, BackHandler } from "react-native";
 import { useCloud } from "../cloud/CloudContext.tsx";
 import { useAuth } from "../auth/AuthContext.tsx";
 import { useBill } from "../state/BillContext.tsx";
+import {
+  ScreenTransition,
+  TransitionDirection,
+} from "../components/ScreenTransition.tsx";
 import type { CloudRepository } from "../cloud/repository.ts";
 import type {
   GroupSnapshot,
@@ -54,6 +58,12 @@ function SignedInNavigation({
     useCallback(() => repository.getPending(), [repository, route]),
   );
   const recoveryAction = useAction();
+  const prevStackLength = useRef(stack.length);
+  const direction: TransitionDirection =
+    stack.length < prevStackLength.current ? "backward" : "forward";
+  useEffect(() => {
+    prevStackLength.current = stack.length;
+  }, [stack.length]);
   const back = () => {
     if (inspectHistory) setInspectHistory(false);
     if (stack.length > 1) setStack((s) => s.slice(0, -1));
@@ -139,68 +149,85 @@ function SignedInNavigation({
         }}
       />
     );
-  switch (route.type) {
-    case "groups":
-      return (
-        <GroupListScreen
-          {...props}
-          create={() => push({ type: "create" })}
-          invites={() => push({ type: "invites" })}
-          open={(g) => push({ type: "group", id: g.id })}
-        />
-      );
-    case "history":
-      return <HistoryScreen {...props} open={openEvent} />;
-    case "create":
-      return (
-        <CreateGroupScreen
-          {...props}
-          done={(id) =>
-            setStack((s) => [...s.slice(0, -1), { type: "group", id }])
-          }
-        />
-      );
-    case "invites":
-      return <InvitationsScreen {...props} />;
-    case "group":
-      return (
-        <GroupScreen
-          {...props}
-          groupId={route.id}
-          openEvent={openEvent}
-          expense={(group) => push({ type: "expense", group })}
-          people={(group, person) => push({ type: "people", group, person })}
-          repay={(group, transfer) => push({ type: "repay", group, transfer })}
-          settings={(group) => push({ type: "settings", group })}
-        />
-      );
-    case "expense":
-      return <GroupExpenseScreen {...props} group={route.group} done={back} />;
-    case "people":
-      return (
-        <GroupPeopleScreen
-          {...props}
-          group={route.group}
-          person={route.person}
-          done={back}
-        />
-      );
-    case "settings":
-      return <GroupSettingsScreen {...props} group={route.group} done={back} />;
-    case "repay":
-      return (
-        <RepaymentScreen
-          {...props}
-          group={route.group}
-          transfer={route.transfer}
-          done={back}
-        />
-      );
-    case "event":
-      return (
-        <ActivityDetailScreen {...props} event={route.event} done={back} />
-      );
-  }
+  const routeKey =
+    route.type === "group"
+      ? `group:${route.id}`
+      : route.type === "people"
+        ? `people:${route.person?.id ?? "new"}`
+        : route.type === "event"
+          ? `event:${route.event.id}`
+          : route.type;
+
+  const renderContent = () => {
+    switch (route.type) {
+      case "groups":
+        return (
+          <GroupListScreen
+            {...props}
+            create={() => push({ type: "create" })}
+            invites={() => push({ type: "invites" })}
+            open={(g) => push({ type: "group", id: g.id })}
+          />
+        );
+      case "history":
+        return <HistoryScreen {...props} open={openEvent} />;
+      case "create":
+        return (
+          <CreateGroupScreen
+            {...props}
+            done={(id) =>
+              setStack((s) => [...s.slice(0, -1), { type: "group", id }])
+            }
+          />
+        );
+      case "invites":
+        return <InvitationsScreen {...props} />;
+      case "group":
+        return (
+          <GroupScreen
+            {...props}
+            groupId={route.id}
+            openEvent={openEvent}
+            expense={(group) => push({ type: "expense", group })}
+            people={(group, person) => push({ type: "people", group, person })}
+            repay={(group, transfer) => push({ type: "repay", group, transfer })}
+            settings={(group) => push({ type: "settings", group })}
+          />
+        );
+      case "expense":
+        return <GroupExpenseScreen {...props} group={route.group} done={back} />;
+      case "people":
+        return (
+          <GroupPeopleScreen
+            {...props}
+            group={route.group}
+            person={route.person}
+            done={back}
+          />
+        );
+      case "settings":
+        return <GroupSettingsScreen {...props} group={route.group} done={back} />;
+      case "repay":
+        return (
+          <RepaymentScreen
+            {...props}
+            group={route.group}
+            transfer={route.transfer}
+            done={back}
+          />
+        );
+      case "event":
+        return (
+          <ActivityDetailScreen {...props} event={route.event} done={back} />
+        );
+    }
+  };
+
+  return (
+    <ScreenTransition screenKey={routeKey} direction={direction}>
+      {renderContent()}
+    </ScreenTransition>
+  );
 }
 export function CloudNavigator({ initial }: { initial: "groups" | "history" }) {
   const repository = useCloud(),

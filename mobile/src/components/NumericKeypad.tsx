@@ -52,6 +52,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
                 accessibilityLabel={
                   isDel ? "Backspace" : isDot ? "Decimal point" : `Digit ${key}`
                 }
+                unstable_pressDelay={0}
                 style={({ pressed }) => [
                   styles.key,
                   isDel && styles.delKey,
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
   },
   keyPressed: {
     backgroundColor: COLORS.electricMint,
-    transform: [{ scale: 0.94 }],
+    transform: [{ scale: 0.96 }],
   },
   keyDisabled: {
     opacity: 0.25,

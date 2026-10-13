@@ -36,6 +36,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
+      unstable_pressDelay={0}
       style={({ pressed }) => [
         styles.button,
         disabled && styles.disabled,
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   },
   pressed: {
     backgroundColor: COLORS.freshGreen,
-    transform: [{ scale: 0.98 }],
+    transform: [{ scale: 0.985 }],
     opacity: 0.94,
   },
   disabled: {
