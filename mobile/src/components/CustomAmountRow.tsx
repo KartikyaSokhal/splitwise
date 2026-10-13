@@ -135,8 +135,8 @@ const styles = StyleSheet.create({
     ...SHADOWS.subtle,
   },
   cardPinned: {
-    borderColor: "#FCD34D", // Amber border
-    backgroundColor: "#FFFEFA",
+    borderColor: COLORS.warning,
+    backgroundColor: COLORS.surfaceRaised,
   },
   info: {
     flex: 1,
@@ -156,16 +156,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   youBadge: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
     borderWidth: 1,
-    borderColor: "#C7D2FE",
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: RADIUS.full,
   },
   youText: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontSize: 10,
     letterSpacing: 0.6,
   },
@@ -187,13 +187,13 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   inputWrapperPinned: {
-    backgroundColor: "#FEF3C7", // Warm amber
-    borderColor: "#F59E0B",
+    backgroundColor: COLORS.warningLight,
+    borderColor: COLORS.warningBorder,
   },
   currencyPrefix: {
     fontSize: 16,
     fontWeight: "700",
-    color: COLORS.primaryDark,
+    color: COLORS.freshGreen,
     marginRight: 4,
   },
   currencyPrefixPinned: {
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     fontVariant: ["tabular-nums"],
   },
   inputPinned: {
-    color: "#78350F", // Deep rich amber brown
+    color: COLORS.warningText,
   },
   pinnedBadge: {
     minHeight: 32,

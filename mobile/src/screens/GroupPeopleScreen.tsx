@@ -328,7 +328,9 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.full,
   },
   roleBadgeAdmin: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
   },
   roleBadgeRemoved: {
     backgroundColor: COLORS.errorLight,
@@ -339,7 +341,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   roleBadgeTextAdmin: {
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
   },
   roleBadgeTextRemoved: {
     color: COLORS.errorText,

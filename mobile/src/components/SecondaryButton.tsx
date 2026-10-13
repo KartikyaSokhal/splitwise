@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     borderColor: COLORS.border,
     borderWidth: 1.5,
-    borderRadius: RADIUS.lg,
+    borderRadius: RADIUS.pill,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   pressed: {
     backgroundColor: COLORS.surfaceMuted,
-    borderColor: COLORS.borderStrong,
+    borderColor: COLORS.freshGreen,
     transform: [{ scale: 0.98 }],
   },
   disabled: {

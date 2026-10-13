@@ -531,7 +531,9 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   youBadge: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: 6,
     paddingVertical: 1,
     borderRadius: RADIUS.full,
@@ -539,7 +541,7 @@ const styles = StyleSheet.create({
   youBadgeText: {
     fontSize: 9,
     fontWeight: "800",
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
   },
   adminRoleBadge: {
     backgroundColor: COLORS.surfaceMuted,
@@ -681,7 +683,7 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.numericHero,
     fontSize: 26,
     lineHeight: 32,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontVariant: ["tabular-nums"],
   },
   transferNoticeText: {

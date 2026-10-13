@@ -259,14 +259,16 @@ export const ui = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.surfaceMuted,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: SPACING.xs,
   },
   emptyIcon: {
     fontSize: 22,
-    color: COLORS.primary,
+    color: COLORS.electricMint,
   },
   notice: {
     padding: SPACING.md,
@@ -281,7 +283,7 @@ export const ui = StyleSheet.create({
     ...TYPOGRAPHY.numericHero,
     fontSize: 36,
     lineHeight: 44,
-    color: COLORS.primaryDark,
+    color: COLORS.textPrimary,
     fontVariant: ["tabular-nums"],
   },
   divider: {

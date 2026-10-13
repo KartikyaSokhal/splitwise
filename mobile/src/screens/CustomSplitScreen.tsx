@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   totalBadgeText: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontSize: 12,
     fontVariant: ["tabular-nums"],
   },
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   resetButtonText: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontSize: 12,
   },
   statCard: {
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   statValueAccent: {
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
   },
   hintText: {
     ...TYPOGRAPHY.caption,

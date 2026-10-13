@@ -574,11 +574,11 @@ const styles = StyleSheet.create({
   adminMemberRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
     padding: SPACING.md,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.freshGreen,
     gap: SPACING.md,
   },
   memberRow: {
@@ -605,7 +605,9 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   adminBadge: {
-    backgroundColor: COLORS.primaryDark,
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
     borderRadius: RADIUS.full,
@@ -613,7 +615,7 @@ const styles = StyleSheet.create({
   adminBadgeText: {
     fontSize: 10,
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: COLORS.electricMint,
     letterSpacing: 0.5,
   },
   reviewContainer: {

@@ -229,21 +229,25 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.full,
   },
   kindBadge: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.surfaceMuted,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 2,
     borderRadius: RADIUS.full,
   },
   kindBadgeRepayment: {
     backgroundColor: COLORS.successLight,
+    borderColor: COLORS.successBorder,
   },
   kindBadgeVoid: {
     backgroundColor: COLORS.errorLight,
+    borderColor: COLORS.errorBorder,
   },
   kindBadgeText: {
     fontSize: 10,
     fontWeight: "700",
-    color: COLORS.primaryDark,
+    color: COLORS.textSecondary,
     letterSpacing: 0.4,
   },
   kindBadgeTextRepayment: {

@@ -100,9 +100,9 @@ const styles = StyleSheet.create({
   },
   tagContainer: {
     alignSelf: "flex-start",
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
     borderWidth: 1,
-    borderColor: "#C7D2FE",
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: SPACING.md,
     paddingVertical: 3,
     borderRadius: RADIUS.full,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontSize: 11,
     letterSpacing: 0.8,
   },

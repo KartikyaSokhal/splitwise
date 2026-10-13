@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   },
   destinationText: {
     ...TYPOGRAPHY.secondary,
-    color: COLORS.primaryDark,
+    color: COLORS.freshGreen,
     fontWeight: "600",
     marginTop: 1,
   },
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1.5,
-    borderColor: COLORS.primaryLight,
+    borderColor: COLORS.border,
     padding: SPACING.lg,
     gap: SPACING.md,
     ...SHADOWS.card,
@@ -392,7 +392,9 @@ const styles = StyleSheet.create({
   },
   inviteBadge: {
     alignSelf: "flex-start",
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
     borderRadius: RADIUS.full,
@@ -400,7 +402,7 @@ const styles = StyleSheet.create({
   inviteBadgeText: {
     fontSize: 11,
     fontWeight: "700",
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     letterSpacing: 0.3,
   },
   inviteGroupName: {

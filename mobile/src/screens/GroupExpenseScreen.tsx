@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   },
   remainderNoticeText: {
     ...TYPOGRAPHY.secondaryMedium,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontWeight: "600",
   },
   membersSectionTitle: {
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.numericHero,
     fontSize: 36,
     lineHeight: 44,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontVariant: ["tabular-nums"],
   },
   receiptDivider: {

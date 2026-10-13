@@ -91,8 +91,8 @@ const styles = StyleSheet.create({
     ...SHADOWS.subtle,
   },
   cardSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: "#FAF5FF", // Subtle warm tint
+    borderColor: COLORS.electricMint,
+    backgroundColor: COLORS.surfaceRaised,
     ...SHADOWS.card,
   },
   cardPressed: {
@@ -122,8 +122,8 @@ const styles = StyleSheet.create({
     marginRight: SPACING.md,
   },
   iconBoxSelected: {
-    backgroundColor: COLORS.primaryLight,
-    borderColor: "#C7D2FE",
+    backgroundColor: COLORS.electricMint,
+    borderColor: COLORS.freshGreen,
   },
   icon: {
     fontSize: 20,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   titleSelected: {
-    color: COLORS.primaryDark,
+    color: COLORS.textPrimary,
   },
   subtitle: {
     ...TYPOGRAPHY.body,
@@ -157,11 +157,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   radioCircleSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary,
+    borderColor: COLORS.electricMint,
+    backgroundColor: COLORS.electricMint,
   },
   checkmark: {
-    color: "#FFFFFF",
+    color: COLORS.electricMintDark,
     fontSize: 13,
     fontWeight: "900",
   },
@@ -180,8 +180,8 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.full,
   },
   badgeSelected: {
-    backgroundColor: COLORS.primaryLight,
-    borderColor: "#C7D2FE",
+    backgroundColor: COLORS.deepForest,
+    borderColor: COLORS.freshGreen,
   },
   badgeIcon: {
     fontSize: 13,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   badgeTextSelected: {
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
   },
 });
 

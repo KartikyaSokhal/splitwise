@@ -5,11 +5,13 @@ import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme
 export type AmountDisplayProps = {
   value: string;
   showCursor?: boolean;
+  borderless?: boolean;
 };
 
 export const AmountDisplay: React.FC<AmountDisplayProps> = ({
   value,
   showCursor = true,
+  borderless = false,
 }) => {
   const [cursorVisible, setCursorVisible] = useState(true);
 
@@ -25,7 +27,7 @@ export const AmountDisplay: React.FC<AmountDisplayProps> = ({
 
   return (
     <View
-      style={styles.card}
+      style={[styles.card, borderless && styles.cardBorderless]}
       accessible={true}
       accessibilityRole="text"
       accessibilityLabel={`Amount entered: ${displayValue} rupees`}
@@ -67,9 +69,16 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: SPACING.xl,
+    paddingVertical: SPACING.xxl,
     paddingHorizontal: SPACING.lg,
     ...SHADOWS.card,
+  },
+  cardBorderless: {
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    shadowOpacity: 0,
+    elevation: 0,
+    paddingVertical: SPACING.md,
   },
   amountContainer: {
     flexDirection: "row",
@@ -77,17 +86,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   currencySymbol: {
-    fontSize: 34,
+    fontSize: 38,
     fontWeight: "700",
-    color: COLORS.primaryDark,
+    color: COLORS.freshGreen,
     marginRight: 6,
-    lineHeight: 48,
+    fontFamily: TYPOGRAPHY.hero.fontFamily,
+    lineHeight: 52,
   },
   amountText: {
-    fontSize: 48,
+    fontSize: 54,
     fontWeight: "800",
     color: COLORS.textPrimary,
     letterSpacing: -1,
+    fontFamily: TYPOGRAPHY.hero.fontFamily,
     fontVariant: ["tabular-nums"],
   },
   amountTextPlaceholder: {
@@ -95,8 +106,8 @@ const styles = StyleSheet.create({
   },
   cursor: {
     width: 3.5,
-    height: 44,
-    backgroundColor: COLORS.primary,
+    height: 48,
+    backgroundColor: COLORS.electricMint,
     marginLeft: 6,
     borderRadius: 2,
   },
@@ -104,7 +115,8 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.caption,
     color: COLORS.textSecondary,
     marginTop: SPACING.xs,
-    letterSpacing: 0.2,
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
   },
 });
 

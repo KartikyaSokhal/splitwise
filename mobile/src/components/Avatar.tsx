@@ -27,9 +27,9 @@ export const Avatar: React.FC<AvatarProps> = ({
   const initial = (name.trim()[0] || "?").toUpperCase();
   const palette = getPalette(name);
 
-  const bg = highlight ? COLORS.primary : palette.bg;
-  const textColor = highlight ? "#FFFFFF" : palette.text;
-  const borderColor = highlight ? COLORS.primaryDark : palette.border;
+  const bg = highlight ? COLORS.electricMint : palette.bg;
+  const textColor = highlight ? COLORS.electricMintDark : palette.text;
+  const borderColor = highlight ? COLORS.freshGreen : palette.border;
 
   return (
     <View

@@ -237,7 +237,9 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   paysBadge: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: RADIUS.full,
@@ -245,7 +247,7 @@ const styles = StyleSheet.create({
   paysBadgeText: {
     fontSize: 9,
     fontWeight: "800",
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     letterSpacing: 0.5,
   },
   amountHeroBlock: {
@@ -265,7 +267,7 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.numericHero,
     fontSize: 34,
     lineHeight: 42,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontVariant: ["tabular-nums"],
   },
   amountHeroSubtext: {
@@ -285,9 +287,9 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flexDirection: "row",
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.surfaceMuted,
     borderWidth: 1,
-    borderColor: COLORS.borderFocus,
+    borderColor: COLORS.border,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     gap: SPACING.sm,
@@ -295,12 +297,12 @@ const styles = StyleSheet.create({
   },
   infoBoxIcon: {
     fontSize: 16,
-    color: COLORS.primary,
+    color: COLORS.electricMint,
     marginTop: 1,
   },
   infoBoxText: {
     ...TYPOGRAPHY.secondary,
-    color: COLORS.primaryDark,
+    color: COLORS.textSecondary,
     flex: 1,
     lineHeight: 20,
   },

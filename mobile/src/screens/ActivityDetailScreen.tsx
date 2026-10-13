@@ -246,7 +246,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   kindBadge: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
     borderRadius: RADIUS.full,
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
   kindBadgeText: {
     fontSize: 10,
     fontWeight: "800",
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     letterSpacing: 0.8,
   },
   detailTitle: {
@@ -272,7 +274,7 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.numericHero,
     fontSize: 34,
     lineHeight: 42,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontVariant: ["tabular-nums"],
     marginTop: SPACING.xs,
   },

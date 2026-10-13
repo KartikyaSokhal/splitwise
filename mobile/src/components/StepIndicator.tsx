@@ -60,12 +60,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   stepBarActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.electricMint,
     width: 14,
   },
   text: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontSize: 11,
   },
 });

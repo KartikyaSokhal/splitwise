@@ -10,6 +10,7 @@ import { AmountDisplay } from "../components/AmountDisplay.tsx";
 import { NumericKeypad } from "../components/NumericKeypad.tsx";
 import { PrimaryButton } from "../components/PrimaryButton.tsx";
 import { ErrorMessage } from "../components/ErrorMessage.tsx";
+import { OrganicSeam } from "../components/OrganicSeam.tsx";
 import { useBill } from "../state/BillContext.tsx";
 
 export const EnterTotalScreen: React.FC = () => {
@@ -33,36 +34,50 @@ export const EnterTotalScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader
-        title="How much?"
-        subtitle="Enter the total bill amount"
-        onBack={goBack}
-        rightElement={<StepIndicator currentStep={1} totalSteps={3} />}
+      {/* Top Deep Forest Hero Section (echoing Reference Screen 2) */}
+      <View style={styles.heroSection}>
+        <ScreenHeader
+          title="How much?"
+          subtitle="Enter the total bill amount"
+          onBack={goBack}
+          rightElement={<StepIndicator currentStep={1} totalSteps={3} />}
+        />
+
+        <View style={styles.amountSection}>
+          <AmountDisplay value={totalInput} borderless={true} />
+          {totalError && totalInput.length > 0 ? (
+            <View style={styles.errorWrapper}>
+              <ErrorMessage message={totalError} />
+            </View>
+          ) : null}
+        </View>
+      </View>
+
+      {/* Undulating Organic Seam transitioning from Deep Forest to Midnight */}
+      <OrganicSeam
+        fromColor={COLORS.deepForest}
+        toColor={COLORS.midnight}
+        height={46}
+        hasCutouts={true}
       />
 
-      <View style={styles.amountSection}>
-        <AmountDisplay value={totalInput} />
-        {totalError && totalInput.length > 0 ? (
-          <View style={styles.errorWrapper}>
-            <ErrorMessage message={totalError} />
-          </View>
-        ) : null}
-      </View>
+      {/* Lower Midnight Keypad & Action Section */}
+      <View style={styles.bottomSection}>
+        <View style={styles.keypadSection}>
+          <NumericKeypad
+            onDigitPress={appendKeypad}
+            onBackspacePress={backspaceKeypad}
+          />
+        </View>
 
-      <View style={styles.keypadSection}>
-        <NumericKeypad
-          onDigitPress={appendKeypad}
-          onBackspacePress={backspaceKeypad}
-        />
-      </View>
-
-      <View style={styles.footer}>
-        <PrimaryButton
-          title="Continue"
-          onPress={handleContinue}
-          disabled={isContinueDisabled}
-          accessibilityLabel="Continue to people selection"
-        />
+        <View style={styles.footer}>
+          <PrimaryButton
+            title="Continue"
+            onPress={handleContinue}
+            disabled={isContinueDisabled}
+            accessibilityLabel="Continue to people selection"
+          />
+        </View>
       </View>
     </View>
   );
@@ -74,24 +89,33 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 760,
     alignSelf: "center",
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.midnight,
     justifyContent: "space-between",
-    paddingBottom: SPACING.lg,
+  },
+  heroSection: {
+    backgroundColor: COLORS.deepForest,
+    paddingBottom: SPACING.md,
   },
   amountSection: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.lg,
   },
   errorWrapper: {
     width: "100%",
     marginTop: SPACING.sm,
   },
+  bottomSection: {
+    flex: 1,
+    justifyContent: "space-between",
+    paddingBottom: SPACING.lg,
+    backgroundColor: COLORS.midnight,
+  },
   keypadSection: {
     width: "100%",
     paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.sm,
     paddingBottom: SPACING.sm,
   },
   footer: {

@@ -133,7 +133,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
     borderRadius: RADIUS.full,
@@ -145,7 +147,7 @@ const styles = StyleSheet.create({
   shieldLabel: {
     fontSize: 10,
     fontWeight: "800",
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     letterSpacing: 0.6,
   },
   operationTitle: {

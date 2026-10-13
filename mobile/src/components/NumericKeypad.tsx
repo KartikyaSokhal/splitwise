@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    gap: SPACING.sm,
+    paddingVertical: SPACING.sm,
+    gap: SPACING.md,
   },
   row: {
     flexDirection: "row",
@@ -95,37 +95,37 @@ const styles = StyleSheet.create({
   },
   key: {
     flex: 1,
-    height: 60,
-    backgroundColor: COLORS.surface,
+    height: 64,
+    backgroundColor: COLORS.warmIvory,
     borderRadius: RADIUS.lg,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
     ...SHADOWS.keypad,
   },
   delKey: {
     backgroundColor: COLORS.surfaceMuted,
+    borderWidth: 1.5,
     borderColor: COLORS.borderStrong,
   },
   keyPressed: {
-    backgroundColor: COLORS.primaryLight,
-    borderColor: COLORS.primary,
+    backgroundColor: COLORS.electricMint,
     transform: [{ scale: 0.94 }],
   },
   keyDisabled: {
-    opacity: 0.3,
+    opacity: 0.25,
   },
   keyText: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "700",
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
+    fontFamily: TYPOGRAPHY.hero.fontFamily,
     fontVariant: ["tabular-nums"],
   },
   dotKeyText: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "900",
     lineHeight: 28,
+    color: COLORS.textDark,
   },
   keyTextDisabled: {
     color: COLORS.textMuted,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   delIcon: {
     fontSize: 22,
     fontWeight: "700",
-    color: COLORS.errorText,
+    color: COLORS.textPrimary,
   },
 });
 

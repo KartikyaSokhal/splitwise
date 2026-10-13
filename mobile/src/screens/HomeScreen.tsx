@@ -75,20 +75,20 @@ export const HomeScreen: React.FC = () => {
           </View>
           <View style={styles.motifSharesRow}>
             <View style={styles.motifShareChip}>
-              <View style={[styles.motifAvatar, { backgroundColor: "#EEF2FF" }]}>
-                <Text style={[styles.motifAvatarText, { color: "#4338CA" }]}>Y</Text>
+              <View style={[styles.motifAvatar, { backgroundColor: COLORS.electricMint }]}>
+                <Text style={[styles.motifAvatarText, { color: COLORS.electricMintDark }]}>Y</Text>
               </View>
               <Text style={styles.motifShareAmount}>₹400</Text>
             </View>
             <View style={styles.motifShareChip}>
-              <View style={[styles.motifAvatar, { backgroundColor: "#ECFDF5" }]}>
-                <Text style={[styles.motifAvatarText, { color: "#065F46" }]}>P</Text>
+              <View style={[styles.motifAvatar, { backgroundColor: COLORS.freshGreen }]}>
+                <Text style={[styles.motifAvatarText, { color: COLORS.deepForest }]}>P</Text>
               </View>
               <Text style={styles.motifShareAmount}>₹400</Text>
             </View>
             <View style={styles.motifShareChip}>
-              <View style={[styles.motifAvatar, { backgroundColor: "#FFF1F2" }]}>
-                <Text style={[styles.motifAvatarText, { color: "#9F1239" }]}>V</Text>
+              <View style={[styles.motifAvatar, { backgroundColor: COLORS.warmIvory }]}>
+                <Text style={[styles.motifAvatarText, { color: COLORS.textDark }]}>V</Text>
               </View>
               <Text style={styles.motifShareAmount}>₹400</Text>
             </View>
@@ -173,20 +173,22 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: RADIUS.md,
-    backgroundColor: COLORS.primaryDark,
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
     alignItems: "center",
     justifyContent: "center",
     ...SHADOWS.subtle,
   },
   logoGlyph: {
-    color: "#FFFFFF",
+    color: COLORS.electricMint,
     fontSize: 18,
     fontWeight: "900",
   },
   brand: {
     ...TYPOGRAPHY.screenTitle,
     fontWeight: "900",
-    color: COLORS.midnight,
+    color: COLORS.textPrimary,
     letterSpacing: -0.8,
   },
   accountChip: {
@@ -221,9 +223,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
     borderWidth: 1,
-    borderColor: "#C7D2FE",
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: SPACING.md,
     paddingVertical: 4,
     borderRadius: RADIUS.full,
@@ -234,11 +236,11 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.electricMint,
   },
   pillBadgeText: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontSize: 11,
     letterSpacing: 0.8,
   },
@@ -256,9 +258,9 @@ const styles = StyleSheet.create({
   quickCard: {
     padding: SPACING.xl,
     borderRadius: RADIUS.card,
-    backgroundColor: COLORS.surface,
-    borderWidth: 2,
-    borderColor: "#C7D2FE", // Soft indigo border
+    backgroundColor: COLORS.midnightCard,
+    borderWidth: 1.5,
+    borderColor: COLORS.borderStrong,
     gap: SPACING.lg,
     ...SHADOWS.card,
   },
@@ -269,7 +271,7 @@ const styles = StyleSheet.create({
   },
   quickEyebrow: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primary,
+    color: COLORS.electricMint,
     letterSpacing: 0.8,
   },
   quickTitle: {
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   motifContainer: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.midnight,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,
@@ -304,7 +306,7 @@ const styles = StyleSheet.create({
   motifTotalBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.surfaceMuted,
     paddingHorizontal: SPACING.md,
     paddingVertical: 4,
     borderRadius: RADIUS.full,
@@ -318,7 +320,7 @@ const styles = StyleSheet.create({
   },
   motifTotalValue: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontVariant: ["tabular-nums"],
   },
   motifArrow: {

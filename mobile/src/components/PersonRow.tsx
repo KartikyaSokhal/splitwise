@@ -90,9 +90,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   youBadge: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
     borderWidth: 1,
-    borderColor: "#C7D2FE",
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: RADIUS.full,
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   youText: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primaryDark,
+    color: COLORS.electricMint,
     fontSize: 10,
     letterSpacing: 0.6,
   },
