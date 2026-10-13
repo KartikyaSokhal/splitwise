@@ -59,6 +59,8 @@ export const PeopleScreen: React.FC = () => {
     (s) => !people.some((p) => p.name.toLowerCase() === s.toLowerCase()),
   );
 
+  const [inputFocused, setInputFocused] = useState(false);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -114,6 +116,8 @@ export const PeopleScreen: React.FC = () => {
           <View style={styles.inputRow}>
             <TextInput
               value={nameInput}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
               onChangeText={(text) => {
                 setNameInput(text);
                 if (inputError) setInputError(null);
@@ -122,7 +126,10 @@ export const PeopleScreen: React.FC = () => {
               placeholderTextColor={COLORS.textMuted}
               accessible={true}
               accessibilityLabel="Person name input"
-              style={styles.textInput}
+              style={[
+                styles.textInput,
+                inputFocused && styles.textInputFocused,
+              ]}
               returnKeyType="done"
               onSubmitEditing={() => handleAdd()}
             />
@@ -131,6 +138,7 @@ export const PeopleScreen: React.FC = () => {
               accessible={true}
               accessibilityRole="button"
               accessibilityLabel="Add person"
+              unstable_pressDelay={0}
               style={({ pressed }) => [
                 styles.addBtn,
                 pressed && styles.addBtnPressed,
@@ -270,6 +278,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     fontSize: 16,
     color: COLORS.textPrimary,
+  },
+  textInputFocused: {
+    borderColor: COLORS.electricMint,
+    backgroundColor: COLORS.surface,
   },
   addBtn: {
     height: 50,

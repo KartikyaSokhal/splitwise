@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -7,6 +7,13 @@ import {
 } from "react-native";
 import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { Avatar } from "./Avatar.tsx";
+import {
+  SafeAnimated,
+  SafeEasing,
+  USE_NATIVE_DRIVER,
+  useReducedMotion,
+  hasNativeAnimated,
+} from "../utils/motion.ts";
 
 export type PersonRowProps = {
   name: string;
@@ -23,8 +30,37 @@ export const PersonRow: React.FC<PersonRowProps> = ({
   onRemove,
   canRemove = true,
 }) => {
+  const reduceMotion = useReducedMotion();
+  const enterAnim = useRef(
+    new SafeAnimated.Value(reduceMotion || !hasNativeAnimated ? 1 : 0),
+  ).current;
+
+  useEffect(() => {
+    if (!reduceMotion && hasNativeAnimated) {
+      SafeAnimated.timing(enterAnim, {
+        toValue: 1,
+        duration: 180,
+        easing: SafeEasing.out(SafeEasing.cubic),
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }).start();
+    }
+  }, [enterAnim, reduceMotion]);
+
+  const translateY = enterAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [6, 0],
+  });
+
   return (
-    <View style={styles.card}>
+    <SafeAnimated.View
+      style={[
+        styles.card,
+        {
+          opacity: enterAnim,
+          transform: [{ translateY }],
+        },
+      ]}
+    >
       <Avatar name={name} size={44} highlight={isYou} />
 
       <View style={styles.info}>
@@ -47,6 +83,7 @@ export const PersonRow: React.FC<PersonRowProps> = ({
           accessible={true}
           accessibilityRole="button"
           accessibilityLabel={`Remove ${name}`}
+          unstable_pressDelay={0}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           style={({ pressed }) => [
             styles.removeButton,
@@ -56,7 +93,7 @@ export const PersonRow: React.FC<PersonRowProps> = ({
           <Text style={styles.removeIcon}>✕</Text>
         </Pressable>
       ) : null}
-    </View>
+    </SafeAnimated.View>
   );
 };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,17 +8,52 @@ import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme
 import { PrimaryButton } from "../components/PrimaryButton.tsx";
 import { SecondaryButton } from "../components/SecondaryButton.tsx";
 import { useBill } from "../state/BillContext.tsx";
+import {
+  SafeAnimated,
+  SafeEasing,
+  USE_NATIVE_DRIVER,
+  useReducedMotion,
+  hasNativeAnimated,
+} from "../utils/motion.ts";
 
 export const SuccessScreen: React.FC = () => {
   const { startNewSplit, resetBill } = useBill();
+  const reduceMotion = useReducedMotion();
+  const checkAnim = useRef(
+    new SafeAnimated.Value(reduceMotion || !hasNativeAnimated ? 1 : 0),
+  ).current;
+
+  useEffect(() => {
+    if (!reduceMotion && hasNativeAnimated) {
+      SafeAnimated.timing(checkAnim, {
+        toValue: 1,
+        duration: 240,
+        easing: SafeEasing.out(SafeEasing.cubic),
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }).start();
+    }
+  }, [checkAnim, reduceMotion]);
+
+  const iconScale = checkAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.82, 1],
+  });
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         {/* Success Icon */}
-        <View style={styles.iconCircle}>
+        <SafeAnimated.View
+          style={[
+            styles.iconCircle,
+            {
+              opacity: checkAnim,
+              transform: [{ scale: iconScale }],
+            },
+          ]}
+        >
           <Text style={styles.checkIcon}>✓</Text>
-        </View>
+        </SafeAnimated.View>
 
         <Text style={styles.title}>Split ready</Text>
         <Text style={styles.subtitle}>Check your chosen app to confirm delivery.</Text>

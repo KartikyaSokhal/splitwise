@@ -32,6 +32,7 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
   percentOfTotal,
   maxLength = 12,
 }) => {
+  const [isFocused, setIsFocused] = React.useState(false);
   const draft = useRef(value);
   const initial = useRef(value);
   const dirty = useRef(false);
@@ -83,6 +84,7 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
         style={[
           styles.inputWrapper,
           isPinned ? styles.inputWrapperPinned : null,
+          isFocused ? styles.inputWrapperFocused : null,
         ]}
       >
         <Text
@@ -96,6 +98,7 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
         <TextInput
           value={value}
           onFocus={() => {
+            setIsFocused(true);
             initial.current = value;
             draft.current = value;
             dirty.current = false;
@@ -105,8 +108,14 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
             dirty.current = text !== initial.current;
             onChangeValue(text);
           }}
-          onBlur={commit}
-          onSubmitEditing={commit}
+          onBlur={() => {
+            setIsFocused(false);
+            commit();
+          }}
+          onSubmitEditing={() => {
+            setIsFocused(false);
+            commit();
+          }}
           returnKeyType="done"
           keyboardType="numeric"
           placeholder="0"
@@ -189,6 +198,10 @@ const styles = StyleSheet.create({
   inputWrapperPinned: {
     backgroundColor: COLORS.warningLight,
     borderColor: COLORS.warningBorder,
+  },
+  inputWrapperFocused: {
+    borderColor: COLORS.electricMint,
+    backgroundColor: COLORS.surface,
   },
   currencyPrefix: {
     fontSize: 16,

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Alert, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { ScreenHeader } from "../components/ScreenHeader.tsx";
@@ -8,6 +8,13 @@ import { SecondaryButton } from "../components/SecondaryButton.tsx";
 import { useBill } from "../state/BillContext.tsx";
 import { formatMinorAsInr } from "../utils/money.ts";
 import { prepareBillShare, shareCurrentBill } from "../state/shareBoundary.ts";
+import {
+  SafeAnimated,
+  SafeEasing,
+  USE_NATIVE_DRIVER,
+  useReducedMotion,
+  hasNativeAnimated,
+} from "../utils/motion.ts";
 
 export const ReviewScreen: React.FC = () => {
   const {
@@ -20,6 +27,32 @@ export const ReviewScreen: React.FC = () => {
     people,
     customShares,
   } = useBill();
+
+  const reduceMotion = useReducedMotion();
+  const settleAnim = useRef(
+    new SafeAnimated.Value(reduceMotion || !hasNativeAnimated ? 1 : 0),
+  ).current;
+
+  useEffect(() => {
+    if (!reduceMotion && hasNativeAnimated) {
+      SafeAnimated.timing(settleAnim, {
+        toValue: 1,
+        duration: 220,
+        easing: SafeEasing.out(SafeEasing.cubic),
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }).start();
+    }
+  }, [settleAnim, reduceMotion]);
+
+  const translateY = settleAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [10, 0],
+  });
+
+  const opacity = settleAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.85, 1],
+  });
 
   const [sharing, setSharing] = useState(false);
   const sharingNow = useRef(false);
@@ -83,7 +116,12 @@ export const ReviewScreen: React.FC = () => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.reviewCard}>
+        <SafeAnimated.View
+          style={[
+            styles.reviewCard,
+            { opacity, transform: [{ translateY }] },
+          ]}
+        >
           {/* Receipt Top Perforation & Header */}
           <View style={styles.receiptHeader}>
             <View style={styles.receiptHeaderBadge}>
@@ -128,7 +166,7 @@ export const ReviewScreen: React.FC = () => {
             </View>
             <Text style={styles.totalAmount}>₹{formattedTotal}</Text>
           </View>
-        </View>
+        </SafeAnimated.View>
 
         <Text style={styles.shareNote}>
           Tap Share Split to open your native share sheet (WhatsApp, Messages, etc.)

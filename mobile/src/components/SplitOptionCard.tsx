@@ -35,6 +35,7 @@ export const SplitOptionCard: React.FC<SplitOptionCardProps> = ({
       accessibilityRole="radio"
       accessibilityState={{ selected }}
       accessibilityLabel={accessibilityLabel || `${title}: ${subtitle}`}
+      unstable_pressDelay={0}
       style={({ pressed }) => [
         styles.card,
         selected && styles.cardSelected,
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     ...SHADOWS.card,
   },
   cardPressed: {
-    transform: [{ scale: 0.98 }],
+    transform: [{ scale: 0.985 }],
     opacity: 0.96,
   },
   topRow: {

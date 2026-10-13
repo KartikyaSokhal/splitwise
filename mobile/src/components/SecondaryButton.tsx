@@ -35,6 +35,7 @@ export const SecondaryButton: React.FC<SecondaryButtonProps> = ({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
       accessibilityState={{ disabled }}
+      unstable_pressDelay={0}
       style={({ pressed }) => [
         styles.button,
         pressed && !disabled && styles.pressed,
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
   pressed: {
     backgroundColor: COLORS.surfaceMuted,
     borderColor: COLORS.freshGreen,
-    transform: [{ scale: 0.98 }],
+    transform: [{ scale: 0.985 }],
   },
   disabled: {
     opacity: 0.5,
