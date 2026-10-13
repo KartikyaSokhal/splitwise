@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { formatMinorAsInr } from "../utils/money.ts";
 
 export type ReconciliationBannerProps = {
@@ -41,9 +41,11 @@ export const ReconciliationBanner: React.FC<ReconciliationBannerProps> = ({
           </View>
           <Text style={styles.successText}>Total matches</Text>
         </View>
-        <Text style={styles.successRatioText}>
-          ₹{formatMinorAsInr(totalMinor)} / ₹{formatMinorAsInr(totalMinor)}
-        </Text>
+        <View style={styles.ratioBadgeSuccess}>
+          <Text style={styles.successRatioText}>
+            ₹{formatMinorAsInr(totalMinor)} / ₹{formatMinorAsInr(totalMinor)}
+          </Text>
+        </View>
       </View>
     );
   }
@@ -72,9 +74,11 @@ export const ReconciliationBanner: React.FC<ReconciliationBannerProps> = ({
           {statusMessage}
         </Text>
       </View>
-      <Text style={styles.ratioText}>
-        ₹{formatMinorAsInr(Math.max(0, allocatedMinor))} / ₹{formatMinorAsInr(totalMinor)}
-      </Text>
+      <View style={isOver ? styles.ratioBadgeError : styles.ratioBadgeWarning}>
+        <Text style={isOver ? styles.ratioTextError : styles.ratioTextWarning}>
+          ₹{formatMinorAsInr(Math.max(0, allocatedMinor))} / ₹{formatMinorAsInr(totalMinor)}
+        </Text>
+      </View>
     </View>
   );
 };
@@ -88,69 +92,106 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.lg,
     marginVertical: SPACING.sm,
-    borderWidth: 1,
+    borderWidth: 1.5,
+    ...SHADOWS.subtle,
   },
   left: {
     flexDirection: "row",
     alignItems: "center",
+    gap: SPACING.xs,
   },
   successContainer: {
     backgroundColor: COLORS.successLight,
-    borderColor: "#86EFAC",
+    borderColor: COLORS.successBorder,
   },
   checkCircle: {
     width: 22,
     height: 22,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.success,
+    backgroundColor: COLORS.freshGreen,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: SPACING.sm,
+    marginRight: 4,
   },
   checkIcon: {
-    color: "#FFFFFF",
+    color: COLORS.midnight,
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "900",
   },
   successText: {
     ...TYPOGRAPHY.bodyMedium,
     color: COLORS.successText,
-    fontWeight: "700",
+    fontWeight: "800",
+  },
+  ratioBadgeSuccess: {
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 3,
+    borderRadius: RADIUS.full,
   },
   successRatioText: {
-    ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.successText,
-    fontWeight: "700",
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.electricMint,
+    fontVariant: ["tabular-nums"],
   },
   warningContainer: {
     backgroundColor: COLORS.warningLight,
-    borderColor: "#FDE68A",
+    borderColor: COLORS.warningBorder,
   },
   warningIcon: {
     fontSize: 16,
-    marginRight: SPACING.sm,
+    marginRight: 4,
   },
   warningText: {
     ...TYPOGRAPHY.bodyMedium,
     color: COLORS.warningText,
-    fontWeight: "700",
+    fontWeight: "800",
+  },
+  ratioBadgeWarning: {
+    backgroundColor: COLORS.warningLight,
+    borderWidth: 1,
+    borderColor: COLORS.warningBorder,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 3,
+    borderRadius: RADIUS.full,
+  },
+  ratioTextWarning: {
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.warningText,
+    fontVariant: ["tabular-nums"],
   },
   errorContainer: {
     backgroundColor: COLORS.errorLight,
-    borderColor: "#FECACA",
+    borderColor: COLORS.errorBorder,
   },
   errorIcon: {
     fontSize: 16,
-    marginRight: SPACING.sm,
+    marginRight: 4,
   },
   errorText: {
     ...TYPOGRAPHY.bodyMedium,
     color: COLORS.errorText,
-    fontWeight: "700",
+    fontWeight: "800",
+  },
+  ratioBadgeError: {
+    backgroundColor: COLORS.errorLight,
+    borderWidth: 1,
+    borderColor: COLORS.errorBorder,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 3,
+    borderRadius: RADIUS.full,
+  },
+  ratioTextError: {
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.errorText,
+    fontVariant: ["tabular-nums"],
   },
   ratioText: {
-    ...TYPOGRAPHY.secondaryMedium,
+    ...TYPOGRAPHY.captionBold,
     color: COLORS.textSecondary,
-    fontWeight: "600",
+    fontVariant: ["tabular-nums"],
   },
 });
+

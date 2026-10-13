@@ -5,7 +5,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { COLORS, RADIUS, SPACING } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 
 export type NumericKeypadProps = {
   onDigitPress: (digit: string) => void;
@@ -54,6 +54,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
                 }
                 style={({ pressed }) => [
                   styles.key,
+                  isDel && styles.delKey,
                   isDisabled && styles.keyDisabled,
                   pressed && !isDisabled && styles.keyPressed,
                 ]}
@@ -64,6 +65,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
                   <Text
                     style={[
                       styles.keyText,
+                      isDot && styles.dotKeyText,
                       isDisabled && styles.keyTextDisabled,
                     ]}
                   >
@@ -83,47 +85,55 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    gap: SPACING.sm,
+    paddingVertical: SPACING.sm,
+    gap: SPACING.md,
   },
   row: {
     flexDirection: "row",
-    gap: SPACING.sm,
+    gap: SPACING.md,
     justifyContent: "space-between",
   },
   key: {
     flex: 1,
-    height: 56,
-    backgroundColor: COLORS.surface,
+    height: 64,
+    backgroundColor: COLORS.warmIvory,
     borderRadius: RADIUS.lg,
-    borderWidth: 1,
-    borderColor: COLORS.borderSubtle,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 2,
-    elevation: 1,
+    ...SHADOWS.keypad,
+  },
+  delKey: {
+    backgroundColor: COLORS.surfaceMuted,
+    borderWidth: 1.5,
+    borderColor: COLORS.borderStrong,
   },
   keyPressed: {
-    backgroundColor: COLORS.primaryLight,
-    borderColor: COLORS.primary,
+    backgroundColor: COLORS.electricMint,
+    transform: [{ scale: 0.94 }],
   },
   keyDisabled: {
-    opacity: 0.3,
+    opacity: 0.25,
   },
   keyText: {
-    fontSize: 22,
-    fontWeight: "600",
-    color: COLORS.textPrimary,
+    fontSize: 26,
+    fontWeight: "700",
+    color: COLORS.textDark,
+    fontFamily: TYPOGRAPHY.hero.fontFamily,
+    fontVariant: ["tabular-nums"],
+  },
+  dotKeyText: {
+    fontSize: 30,
+    fontWeight: "900",
+    lineHeight: 28,
+    color: COLORS.textDark,
   },
   keyTextDisabled: {
     color: COLORS.textMuted,
   },
   delIcon: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 22,
+    fontWeight: "700",
     color: COLORS.textPrimary,
   },
 });
+

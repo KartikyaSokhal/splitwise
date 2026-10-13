@@ -4,7 +4,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { PrimaryButton } from "../components/PrimaryButton.tsx";
 import { SecondaryButton } from "../components/SecondaryButton.tsx";
 import { useBill } from "../state/BillContext.tsx";
@@ -46,6 +46,9 @@ export const SuccessScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
     backgroundColor: COLORS.background,
     justifyContent: "space-between",
     paddingHorizontal: SPACING.xl,
@@ -58,26 +61,27 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   iconCircle: {
-    width: 80,
-    height: 80,
+    width: 88,
+    height: 88,
     borderRadius: RADIUS.full,
     backgroundColor: COLORS.successLight,
     borderWidth: 2,
-    borderColor: "#86EFAC",
+    borderColor: COLORS.successBorder,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: SPACING.xl,
+    ...SHADOWS.card,
   },
   checkIcon: {
-    fontSize: 38,
+    fontSize: 42,
     color: COLORS.success,
-    fontWeight: "800",
+    fontWeight: "900",
   },
   title: {
-    ...TYPOGRAPHY.screenTitle,
-    fontSize: 28,
+    ...TYPOGRAPHY.hero,
+    fontSize: 32,
     color: COLORS.textPrimary,
-    fontWeight: "800",
+    fontWeight: "900",
     textAlign: "center",
   },
   subtitle: {
@@ -85,14 +89,19 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: "center",
     marginTop: SPACING.sm,
+    fontSize: 16,
+    maxWidth: 320,
   },
   footer: {
-    gap: SPACING.md,
+    gap: SPACING.sm,
     alignItems: "stretch",
   },
   homeBtn: {
     borderWidth: 0,
     backgroundColor: "transparent",
     minHeight: 48,
+    shadowOpacity: 0,
+    elevation: 0,
   },
 });
+

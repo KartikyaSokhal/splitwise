@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { Avatar } from "./Avatar.tsx";
 
 export type CustomAmountRowProps = {
@@ -42,8 +42,8 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
     onCommitValue?.(draft.current);
   };
   return (
-    <View style={styles.card}>
-      <Avatar name={name} size={42} />
+    <View style={[styles.card, isPinned && styles.cardPinned]}>
+      <Avatar name={name} size={44} highlight={isYou} />
 
       <View style={styles.info}>
         <View style={styles.nameRow}>
@@ -52,7 +52,7 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
           </Text>
           {isYou ? (
             <View style={styles.youBadge}>
-              <Text style={styles.youText}>You</Text>
+              <Text style={styles.youText}>YOU</Text>
             </View>
           ) : null}
           {isPinned ? (
@@ -74,7 +74,7 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
         </View>
         <Text style={styles.percentText}>
           {percentOfTotal !== undefined && !Number.isNaN(percentOfTotal)
-            ? `${Math.round(percentOfTotal)}% of total`
+            ? `${Math.round(percentOfTotal)}% of bill`
             : "—"}
         </Text>
       </View>
@@ -113,7 +113,7 @@ export const CustomAmountRow: React.FC<CustomAmountRowProps> = ({
           placeholderTextColor={COLORS.textMuted}
           accessible={true}
           accessibilityLabel={`Amount for ${name}`}
-          style={styles.input}
+          style={[styles.input, isPinned && styles.inputPinned]}
           maxLength={maxLength}
         />
       </View>
@@ -128,15 +128,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     padding: SPACING.md,
     marginBottom: SPACING.sm,
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
-    elevation: 1,
+    ...SHADOWS.subtle,
+  },
+  cardPinned: {
+    borderColor: COLORS.warning,
+    backgroundColor: COLORS.surfaceRaised,
   },
   info: {
     flex: 1,
@@ -146,50 +146,54 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
+    gap: SPACING.xs,
   },
   name: {
     ...TYPOGRAPHY.bodyMedium,
     color: COLORS.textPrimary,
-    fontWeight: "600",
-    maxWidth: "80%",
+    fontWeight: "700",
+    maxWidth: "70%",
+    fontSize: 16,
   },
   youBadge: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.deepForest,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: RADIUS.sm,
-    marginLeft: SPACING.sm,
+    borderRadius: RADIUS.full,
   },
   youText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
-    fontWeight: "600",
-    fontSize: 11,
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.electricMint,
+    fontSize: 10,
+    letterSpacing: 0.6,
   },
   percentText: {
     ...TYPOGRAPHY.caption,
     color: COLORS.textSecondary,
     marginTop: 2,
+    fontSize: 13,
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.surfaceMuted,
     borderRadius: RADIUS.md,
-    borderWidth: 1,
-    borderColor: "#E0E7FF",
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
     paddingHorizontal: SPACING.md,
-    minWidth: 110,
+    minWidth: 115,
     minHeight: 48,
   },
   inputWrapperPinned: {
-    backgroundColor: "#FFFBEB",
-    borderColor: "#F59E0B",
+    backgroundColor: COLORS.warningLight,
+    borderColor: COLORS.warningBorder,
   },
   currencyPrefix: {
     fontSize: 16,
-    fontWeight: "600",
-    color: COLORS.primary,
+    fontWeight: "700",
+    color: COLORS.freshGreen,
     marginRight: 4,
   },
   currencyPrefixPinned: {
@@ -198,42 +202,43 @@ const styles = StyleSheet.create({
   input: {
     ...TYPOGRAPHY.bodyMedium,
     flex: 1,
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "800",
     color: COLORS.textPrimary,
     textAlign: "right",
     padding: 0,
+    fontVariant: ["tabular-nums"],
+  },
+  inputPinned: {
+    color: COLORS.warningText,
   },
   pinnedBadge: {
-    minHeight: 44,
+    minHeight: 32,
     justifyContent: "center",
     backgroundColor: COLORS.warningLight,
     borderWidth: 1,
-    borderColor: "#FDE68A",
-    paddingHorizontal: 6,
+    borderColor: COLORS.warningBorder,
+    paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: RADIUS.sm,
-    marginLeft: SPACING.sm,
+    borderRadius: RADIUS.full,
   },
   pinnedBadgeText: {
-    ...TYPOGRAPHY.caption,
+    ...TYPOGRAPHY.captionBold,
     color: COLORS.warningText,
-    fontWeight: "700",
     fontSize: 11,
   },
   autoBadge: {
-    backgroundColor: COLORS.primarySubtle,
+    backgroundColor: COLORS.surfaceMuted,
     borderWidth: 1,
-    borderColor: COLORS.borderSubtle,
-    paddingHorizontal: 6,
+    borderColor: COLORS.border,
+    paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: RADIUS.sm,
-    marginLeft: SPACING.sm,
+    borderRadius: RADIUS.full,
   },
   autoBadgeText: {
-    ...TYPOGRAPHY.caption,
+    ...TYPOGRAPHY.captionBold,
     color: COLORS.textSecondary,
-    fontWeight: "600",
     fontSize: 11,
   },
 });
+

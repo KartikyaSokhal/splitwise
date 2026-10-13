@@ -7,7 +7,7 @@ import {
   StyleProp,
   ActivityIndicator,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 
 export type PrimaryButtonProps = {
   title: string;
@@ -44,7 +44,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color="#FFFFFF" size="small" />
+        <ActivityIndicator color={COLORS.electricMintDark} size="small" />
       ) : (
         <>
           <Text style={[styles.text, disabled && styles.textDisabled]}>
@@ -68,35 +68,45 @@ const styles = StyleSheet.create({
   button: {
     minHeight: 54,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.primary,
-    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.electricMint,
+    borderRadius: RADIUS.pill,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: SPACING.xl,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
+    ...SHADOWS.card,
   },
   pressed: {
-    backgroundColor: COLORS.primaryDark,
-    opacity: 0.95,
+    backgroundColor: COLORS.freshGreen,
+    transform: [{ scale: 0.98 }],
+    opacity: 0.94,
   },
   disabled: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.surfaceMuted,
+    borderColor: COLORS.borderSubtle,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   text: {
     flexShrink: 1,
     textAlign: "center",
     ...TYPOGRAPHY.bodyMedium,
-    color: "#FFFFFF",
-    fontWeight: "600",
+    color: COLORS.electricMintDark,
+    fontWeight: "700",
     fontSize: 16,
+    letterSpacing: 0.2,
+    fontFamily: TYPOGRAPHY.section.fontFamily,
   },
   textDisabled: {
     color: COLORS.textMuted,
   },
   icon: {
-    color: "#FFFFFF",
+    color: COLORS.electricMintDark,
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     marginLeft: SPACING.sm,
   },
 });
+

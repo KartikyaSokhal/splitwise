@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   type TextInputProps,
 } from "react-native";
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, SPACING, RADIUS, SHADOWS, TYPOGRAPHY } from "../constants/theme.ts";
 import { ScreenHeader } from "./ScreenHeader.tsx";
 import { SecondaryButton } from "./SecondaryButton.tsx";
 import { formatMinorAsInr } from "../utils/money.ts";
@@ -80,7 +80,7 @@ export function Field({ label, ...props }: TextInputProps & { label: string }) {
         {...props}
         accessibilityLabel={label}
         style={[ui.input, props.style]}
-        placeholderTextColor={COLORS.textMuted}
+        placeholderTextColor={COLORS.textTertiary}
       />
     </View>
   );
@@ -106,14 +106,14 @@ export function Choice({
       style={({ pressed }) => [
         ui.choice,
         selected && ui.selected,
-        pressed && ui.pressed,
-        disabled && { opacity: 0.55 },
+        pressed && !disabled && ui.pressed,
+        disabled && { opacity: 0.5 },
       ]}
     >
       <Text
         style={[
-          ui.body,
-          selected && { color: COLORS.primaryDark, fontWeight: "600" },
+          ui.choiceText,
+          selected && { color: COLORS.primaryDark, fontWeight: "700" },
         ]}
       >
         {title}
@@ -143,9 +143,10 @@ export function Loading() {
     <View style={ui.empty}>
       <ActivityIndicator
         color={COLORS.primary}
+        size="large"
         accessibilityLabel="Loading saved data"
       />
-      <Body muted>Loading…</Body>
+      <Body muted>Loading your records…</Body>
     </View>
   );
 }
@@ -157,7 +158,10 @@ export function Empty({
   children: React.ReactNode;
 }) {
   return (
-    <View style={ui.empty}>
+    <View style={ui.emptyCard}>
+      <View style={ui.emptyIconCircle}>
+        <Text style={ui.emptyIcon}>✦</Text>
+      </View>
       <Heading>{title}</Heading>
       <Body muted>{children}</Body>
     </View>
@@ -172,24 +176,27 @@ export const ui = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   content: {
-    padding: SPACING.xl,
-    gap: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.sm,
+    gap: SPACING.md,
     paddingBottom: SPACING.huge,
   },
-  body: { ...TYPOGRAPHY.body, color: COLORS.textPrimary, flexShrink: 1 },
+  body: { ...TYPOGRAPHY.body, color: COLORS.textPrimary, flexShrink: 1, fontSize: 15 },
   muted: { color: COLORS.textSecondary },
-  heading: { ...TYPOGRAPHY.section, color: COLORS.textPrimary },
-  label: { ...TYPOGRAPHY.secondaryMedium, color: COLORS.textPrimary },
-  field: { gap: SPACING.sm },
+  heading: { ...TYPOGRAPHY.section, color: COLORS.textPrimary, fontWeight: "700" },
+  label: { ...TYPOGRAPHY.captionBold, color: COLORS.textPrimary, letterSpacing: 0.3 },
+  field: { gap: SPACING.xs },
   input: {
     ...TYPOGRAPHY.body,
     color: COLORS.textPrimary,
-    minHeight: 52,
-    padding: SPACING.md,
+    minHeight: 50,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     borderRadius: RADIUS.md,
+    fontSize: 16,
   },
   row: {
     flexDirection: "row",
@@ -198,45 +205,91 @@ export const ui = StyleSheet.create({
     gap: SPACING.sm,
   },
   choice: {
-    minHeight: 48,
+    minHeight: 44,
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderWidth: 1,
+    paddingVertical: SPACING.sm,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surface,
     justifyContent: "center",
-    flexShrink: 1,
+    alignItems: "center",
+    ...SHADOWS.subtle,
+  },
+  choiceText: {
+    ...TYPOGRAPHY.secondaryMedium,
+    color: COLORS.textSecondary,
+    fontWeight: "600",
   },
   selected: {
     backgroundColor: COLORS.primaryLight,
     borderColor: COLORS.primary,
   },
-  pressed: { opacity: 0.75 },
+  pressed: {
+    transform: [{ scale: 0.96 }],
+    opacity: 0.85,
+  },
   card: {
     padding: SPACING.lg,
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     gap: SPACING.sm,
+    ...SHADOWS.subtle,
   },
-  empty: { padding: SPACING.xl, gap: SPACING.md },
+  empty: {
+    padding: SPACING.xxl,
+    gap: SPACING.md,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyCard: {
+    padding: SPACING.xxl,
+    borderRadius: RADIUS.card,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
+    gap: SPACING.sm,
+    alignItems: "center",
+    textAlign: "center",
+    ...SHADOWS.subtle,
+  },
+  emptyIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surfaceMuted,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: SPACING.xs,
+  },
+  emptyIcon: {
+    fontSize: 22,
+    color: COLORS.electricMint,
+  },
   notice: {
     padding: SPACING.md,
     backgroundColor: COLORS.errorLight,
+    borderWidth: 1,
+    borderColor: COLORS.errorBorder,
     borderRadius: RADIUS.md,
     gap: SPACING.sm,
   },
-  error: { ...TYPOGRAPHY.secondary, color: COLORS.errorText },
+  error: { ...TYPOGRAPHY.secondary, color: COLORS.errorText, fontWeight: "600" },
   amount: {
-    ...TYPOGRAPHY.screenTitle,
-    color: COLORS.primaryDark,
+    ...TYPOGRAPHY.numericHero,
+    fontSize: 36,
+    lineHeight: 44,
+    color: COLORS.textPrimary,
     fontVariant: ["tabular-nums"],
   },
   divider: {
     height: 1,
     backgroundColor: COLORS.border,
-    marginVertical: SPACING.sm,
+    marginVertical: SPACING.xs,
   },
 });
+

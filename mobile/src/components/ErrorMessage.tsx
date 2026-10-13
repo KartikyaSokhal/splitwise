@@ -49,12 +49,12 @@ const styles = StyleSheet.create({
   containerError: {
     backgroundColor: COLORS.errorLight,
     borderWidth: 1,
-    borderColor: "#FECACA",
+    borderColor: COLORS.errorBorder,
   },
   containerWarning: {
     backgroundColor: COLORS.warningLight,
     borderWidth: 1,
-    borderColor: "#FDE68A",
+    borderColor: COLORS.warningBorder,
   },
   icon: {
     fontSize: 14,

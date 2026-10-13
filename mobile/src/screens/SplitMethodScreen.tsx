@@ -5,7 +5,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { ScreenHeader } from "../components/ScreenHeader.tsx";
 import { StepIndicator } from "../components/StepIndicator.tsx";
 import { SplitOptionCard } from "../components/SplitOptionCard.tsx";
@@ -132,6 +132,9 @@ export const SplitMethodScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
     backgroundColor: COLORS.background,
     justifyContent: "space-between",
   },
@@ -148,12 +151,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
+    borderRadius: RADIUS.card,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
-    padding: SPACING.md,
-    marginTop: SPACING.sm,
+    padding: SPACING.lg,
+    marginTop: SPACING.xs,
     marginBottom: SPACING.md,
+    ...SHADOWS.subtle,
   },
   summaryLeft: {
     flexDirection: "row",
@@ -165,8 +169,8 @@ const styles = StyleSheet.create({
     marginRight: SPACING.sm,
   },
   stackedAvatar: {
-    width: 28,
-    height: 28,
+    width: 32,
+    height: 32,
     borderRadius: RADIUS.full,
     backgroundColor: COLORS.primaryLight,
     borderWidth: 2,
@@ -175,42 +179,48 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   stackedAvatarText: {
-    fontSize: 9,
-    fontWeight: "700",
-    color: COLORS.primary,
+    fontSize: 10,
+    fontWeight: "800",
+    color: COLORS.primaryDark,
   },
   participantsText: {
-    ...TYPOGRAPHY.caption,
+    ...TYPOGRAPHY.captionBold,
     color: COLORS.textSecondary,
-    fontWeight: "500",
+    fontSize: 13,
   },
   summaryRight: {
     alignItems: "flex-end",
   },
   totalLabel: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.textMuted,
-    fontSize: 10,
+    color: COLORS.textTertiary,
+    fontSize: 11,
   },
   totalValue: {
-    ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.textPrimary,
-    fontWeight: "700",
+    ...TYPOGRAPHY.section,
+    color: COLORS.primaryDark,
+    fontWeight: "800",
+    fontVariant: ["tabular-nums"],
   },
   hintRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: SPACING.lg,
+    marginTop: SPACING.md,
+    backgroundColor: COLORS.surfaceMuted,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 8,
+    borderRadius: RADIUS.full,
+    alignSelf: "center",
+    gap: 6,
   },
   hintEmoji: {
-    fontSize: 14,
-    marginRight: 6,
+    fontSize: 13,
   },
   hintText: {
-    ...TYPOGRAPHY.secondary,
+    ...TYPOGRAPHY.caption,
     color: COLORS.textSecondary,
-    fontSize: 13,
+    fontSize: 12,
   },
   footer: {
     paddingHorizontal: SPACING.xl,
@@ -220,3 +230,4 @@ const styles = StyleSheet.create({
     borderColor: COLORS.borderSubtle,
   },
 });
+
