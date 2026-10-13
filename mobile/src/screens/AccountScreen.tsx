@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Share, Text, View } from "react-native";
+import { Platform, Share, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../auth/AuthContext.tsx";
 import { useCloud } from "../cloud/CloudContext.tsx";
 import { useAction } from "../cloud/hooks.ts";
 import { useBill } from "../state/BillContext.tsx";
 import { PrimaryButton } from "../components/PrimaryButton.tsx";
 import { SecondaryButton } from "../components/SecondaryButton.tsx";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import {
   PageShell,
   Body,
@@ -22,6 +23,7 @@ export function AccountScreen() {
   const [name, setName] = useState(""),
     [saved, setSaved] = useState(false);
   const action = useAction();
+
   return (
     <PageShell
       title={auth.user ? "Your account" : "Keep it together"}
@@ -31,51 +33,27 @@ export function AccountScreen() {
       <Notice message={auth.message} />
       {auth.user ? (
         <>
-          <View style={ui.card}>
-            <Heading>Signed in to DueShare</Heading>
-            <Body muted>
-              Your groups and history are private to their members. Quick Splits
-              are never uploaded automatically.
-            </Body>
-          </View>
-          <PrimaryButton
-            title="Open your groups"
-            onPress={() => navigate("GROUPS")}
-          />
-          <Field
-            label="Your name for new groups"
-            value={name}
-            onChangeText={(v) => {
-              setName(v);
-              setSaved(false);
-            }}
-            maxLength={100}
-            autoCapitalize="words"
-          />
-          <SecondaryButton
-            title="Save name"
-            disabled={action.busy || !name.trim()}
-            onPress={() =>
-              void action.run(async () => {
-                await repository!.profile(name);
-                setSaved(true);
-              })
-            }
-          />
-          {saved && (
-            <Body>
-              Name saved. Existing group names for you stay unchanged.
-            </Body>
-          )}
-          <View style={ui.card}>
-            <Heading>Your member code</Heading>
-            <Body muted>
-              Share this only with a group admin you trust. They can invite you
+          {/* VIP Member Pass Card */}
+          <View style={styles.memberCard}>
+            <View style={styles.memberCardTop}>
+              <View style={styles.memberBadge}>
+                <Text style={styles.memberBadgeText}>✦ DUESHARE IDENTITY</Text>
+              </View>
+              <Text style={styles.memberStatus}>ACTIVE</Text>
+            </View>
+
+            <View style={styles.memberCodeBlock}>
+              <Text style={styles.memberCodeLabel}>YOUR MEMBER CODE</Text>
+              <Text selectable style={styles.memberCodeText}>
+                {auth.user.id}
+              </Text>
+            </View>
+
+            <Text style={styles.memberCardDisclaimer}>
+              Share this code only with a group admin you trust. They can invite you
               to an existing person; you choose whether to accept.
-            </Body>
-            <Text selectable style={ui.body}>
-              {auth.user.id}
             </Text>
+
             <SecondaryButton
               title="Share member code"
               onPress={() =>
@@ -88,9 +66,53 @@ export function AccountScreen() {
                   });
                 })
               }
+              style={styles.shareCodeBtn}
             />
           </View>
+
+          <PrimaryButton
+            title="Open your groups"
+            onPress={() => navigate("GROUPS")}
+            iconRight="→"
+          />
+
+          {/* Profile Name Card */}
+          <View style={ui.card}>
+            <Heading>Display Profile</Heading>
+            <Body muted>
+              Your default name when creating new groups. Existing group names for you stay unchanged.
+            </Body>
+            <Field
+              label="Your name for new groups"
+              value={name}
+              onChangeText={(v) => {
+                setName(v);
+                setSaved(false);
+              }}
+              maxLength={100}
+              autoCapitalize="words"
+            />
+            <SecondaryButton
+              title="Save name"
+              disabled={action.busy || !name.trim()}
+              onPress={() =>
+                void action.run(async () => {
+                  await repository!.profile(name);
+                  setSaved(true);
+                })
+              }
+            />
+            {saved && (
+              <View style={styles.successPill}>
+                <Text style={styles.successPillText}>
+                  ✓ Name saved for future groups
+                </Text>
+              </View>
+            )}
+          </View>
+
           <Notice message={action.error} />
+
           <SecondaryButton
             title="Sign out on this device"
             onPress={() => void auth.logout()}
@@ -103,30 +125,52 @@ export function AccountScreen() {
         </>
       ) : (
         <>
-          <View style={ui.card}>
+          {/* Cloud Invitation Hero Card */}
+          <View style={styles.guestPromoCard}>
+            <View style={styles.featurePillsRow}>
+              <View style={styles.featurePill}>
+                <Text style={styles.featurePillText}>✈ Trips</Text>
+              </View>
+              <View style={styles.featurePill}>
+                <Text style={styles.featurePillText}>⌂ Roommates</Text>
+              </View>
+              <View style={styles.featurePill}>
+                <Text style={styles.featurePillText}>👥 Multi-Payer</Text>
+              </View>
+              <View style={styles.featurePill}>
+                <Text style={styles.featurePillText}>⚡ Balances</Text>
+              </View>
+            </View>
+
             <Heading>One place for shared costs</Heading>
             <Body muted>
-              Keep a trip, household or everyday group. Save expenses, see who
-              owes what, and record repayments.
+              Keep a trip, household, or everyday group. Save expenses, see who
+              owes what, and record repayments with audit history.
             </Body>
           </View>
+
           {!auth.configured && (
             <Body muted>
               Cloud sign-in is not configured for this build. You can still use
               Quick Split.
             </Body>
           )}
+
           <PrimaryButton
             title="Continue with Google"
             onPress={() => void auth.signIn("google")}
             disabled={!auth.configured || auth.busy}
             loading={auth.busy}
             iconRight=""
+            accessibilityLabel="Continue with Google"
           />
+
           <SecondaryButton
             title="Continue without an account"
             onPress={() => navigate("HOME")}
+            accessibilityLabel="Continue without an account"
           />
+
           {auth.configured && auth.message && (
             <SecondaryButton
               title="Clear device session"
@@ -139,3 +183,110 @@ export function AccountScreen() {
     </PageShell>
   );
 }
+
+const styles = StyleSheet.create({
+  memberCard: {
+    backgroundColor: COLORS.midnightCard,
+    borderRadius: RADIUS.card,
+    padding: SPACING.xl,
+    gap: SPACING.md,
+    borderWidth: 1.5,
+    borderColor: "#374151",
+    ...SHADOWS.raised,
+  },
+  memberCardTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  memberBadge: {
+    backgroundColor: "rgba(99, 102, 241, 0.2)",
+    borderWidth: 1,
+    borderColor: "#6366F1",
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 3,
+    borderRadius: RADIUS.full,
+  },
+  memberBadgeText: {
+    ...TYPOGRAPHY.captionBold,
+    color: "#A5B4FC",
+    fontSize: 10,
+    letterSpacing: 0.8,
+  },
+  memberStatus: {
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.success,
+    fontSize: 10,
+    letterSpacing: 0.8,
+  },
+  memberCodeBlock: {
+    backgroundColor: "rgba(15, 23, 42, 0.8)",
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: "#1E293B",
+    gap: 4,
+  },
+  memberCodeLabel: {
+    ...TYPOGRAPHY.captionBold,
+    color: "#94A3B8",
+    fontSize: 10,
+    letterSpacing: 0.5,
+  },
+  memberCodeText: {
+    fontSize: 14,
+    color: "#F8FAFC",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+    fontWeight: "700",
+  },
+  memberCardDisclaimer: {
+    ...TYPOGRAPHY.caption,
+    color: "#94A3B8",
+    lineHeight: 18,
+  },
+  shareCodeBtn: {
+    backgroundColor: "#1F2937",
+    borderColor: "#4B5563",
+  },
+  guestPromoCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.card,
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
+    padding: SPACING.xl,
+    gap: SPACING.md,
+    ...SHADOWS.card,
+  },
+  featurePillsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: SPACING.xs,
+  },
+  featurePill: {
+    backgroundColor: COLORS.primaryLight,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 4,
+    borderRadius: RADIUS.full,
+    borderWidth: 1,
+    borderColor: "#C7D2FE",
+  },
+  featurePillText: {
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.primaryDark,
+    fontSize: 11,
+  },
+  successPill: {
+    backgroundColor: COLORS.successLight,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 6,
+    borderRadius: RADIUS.full,
+    alignSelf: "flex-start",
+    marginTop: SPACING.xs,
+  },
+  successPillText: {
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.successText,
+    fontSize: 12,
+  },
+});
+

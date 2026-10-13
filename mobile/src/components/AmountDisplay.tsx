@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { COLORS, SPACING } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 
 export type AmountDisplayProps = {
   value: string;
@@ -17,7 +17,7 @@ export const AmountDisplay: React.FC<AmountDisplayProps> = ({
     if (!showCursor) return;
     const interval = setInterval(() => {
       setCursorVisible((prev) => !prev);
-    }, 600);
+    }, 550);
     return () => clearInterval(interval);
   }, [showCursor]);
 
@@ -25,49 +25,86 @@ export const AmountDisplay: React.FC<AmountDisplayProps> = ({
 
   return (
     <View
-      style={styles.container}
+      style={styles.card}
       accessible={true}
       accessibilityRole="text"
       accessibilityLabel={`Amount entered: ${displayValue} rupees`}
     >
-      <Text style={styles.currencySymbol}>₹</Text>
-      <Text style={styles.amountText}>{displayValue}</Text>
-      {showCursor ? (
-        <View
+      <View style={styles.amountContainer}>
+        <Text style={styles.currencySymbol}>₹</Text>
+        <Text
           style={[
-            styles.cursor,
-            { opacity: cursorVisible ? 1 : 0 },
+            styles.amountText,
+            value === "" && styles.amountTextPlaceholder,
           ]}
-        />
-      ) : null}
+          numberOfLines={1}
+          adjustsFontSizeToFit={true}
+        >
+          {displayValue}
+        </Text>
+        {showCursor ? (
+          <View
+            style={[
+              styles.cursor,
+              { opacity: cursorVisible ? 1 : 0 },
+            ]}
+          />
+        ) : null}
+      </View>
+      <Text style={styles.amountCaption}>
+        {value === "" ? "Enter exact bill total" : "Exact total in Indian Rupees"}
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  card: {
+    width: "100%",
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.card,
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: SPACING.xl,
+    paddingHorizontal: SPACING.lg,
+    ...SHADOWS.card,
+  },
+  amountContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: SPACING.md,
   },
   currencySymbol: {
-    fontSize: 32,
-    fontWeight: "600",
-    color: COLORS.textSecondary,
+    fontSize: 34,
+    fontWeight: "700",
+    color: COLORS.primaryDark,
     marginRight: 6,
+    lineHeight: 48,
   },
   amountText: {
-    fontSize: 42,
-    fontWeight: "700",
+    fontSize: 48,
+    fontWeight: "800",
     color: COLORS.textPrimary,
-    letterSpacing: -0.5,
+    letterSpacing: -1,
+    fontVariant: ["tabular-nums"],
+  },
+  amountTextPlaceholder: {
+    color: COLORS.textTertiary,
   },
   cursor: {
-    width: 3,
-    height: 40,
+    width: 3.5,
+    height: 44,
     backgroundColor: COLORS.primary,
-    marginLeft: 4,
+    marginLeft: 6,
     borderRadius: 2,
   },
+  amountCaption: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+    letterSpacing: 0.2,
+  },
 });
+

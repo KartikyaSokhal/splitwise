@@ -9,7 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { ScreenHeader } from "../components/ScreenHeader.tsx";
 import { StepIndicator } from "../components/StepIndicator.tsx";
 import { PersonRow } from "../components/PersonRow.tsx";
@@ -185,6 +185,9 @@ export const PeopleScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
     backgroundColor: COLORS.background,
     justifyContent: "space-between",
   },
@@ -193,14 +196,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   countBadge: {
-    backgroundColor: COLORS.borderSubtle,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 2,
     borderRadius: RADIUS.full,
   },
   countText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.primaryDark,
     fontSize: 11,
   },
   scrollView: {
@@ -213,12 +218,13 @@ const styles = StyleSheet.create({
   emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: SPACING.xl,
+    paddingVertical: SPACING.xxl,
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
+    borderRadius: RADIUS.card,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     marginBottom: SPACING.md,
+    ...SHADOWS.subtle,
   },
   emptyEmoji: {
     fontSize: 32,
@@ -227,6 +233,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     ...TYPOGRAPHY.section,
     color: COLORS.textPrimary,
+    fontWeight: "800",
   },
   emptySubtitle: {
     ...TYPOGRAPHY.secondary,
@@ -235,17 +242,18 @@ const styles = StyleSheet.create({
   },
   addCard: {
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
+    borderRadius: RADIUS.card,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     padding: SPACING.lg,
-    marginTop: SPACING.sm,
+    marginTop: SPACING.xs,
+    gap: SPACING.md,
+    ...SHADOWS.subtle,
   },
   addCardTitle: {
     ...TYPOGRAPHY.bodyMedium,
     color: COLORS.textPrimary,
-    fontWeight: "700",
-    marginBottom: SPACING.sm,
+    fontWeight: "800",
   },
   inputRow: {
     flexDirection: "row",
@@ -254,25 +262,29 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    height: 48,
+    height: 50,
     backgroundColor: COLORS.background,
     borderRadius: RADIUS.md,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     paddingHorizontal: SPACING.md,
     fontSize: 16,
     color: COLORS.textPrimary,
   },
   addBtn: {
-    height: 48,
+    height: 50,
     backgroundColor: COLORS.primary,
     paddingHorizontal: SPACING.xl,
     borderRadius: RADIUS.md,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: COLORS.primaryDark,
+    ...SHADOWS.subtle,
   },
   addBtnPressed: {
     backgroundColor: COLORS.primaryDark,
+    transform: [{ scale: 0.96 }],
   },
   addBtnText: {
     ...TYPOGRAPHY.bodyMedium,
@@ -280,12 +292,13 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   suggestionsContainer: {
-    marginTop: SPACING.md,
+    marginTop: SPACING.xs,
   },
   suggestionsLabel: {
-    ...TYPOGRAPHY.caption,
+    ...TYPOGRAPHY.captionBold,
     color: COLORS.textSecondary,
     marginBottom: SPACING.xs,
+    letterSpacing: 0.3,
   },
   chipsRow: {
     flexDirection: "row",
@@ -295,13 +308,16 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.surfaceMuted,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     paddingHorizontal: SPACING.md,
     paddingVertical: 6,
     borderRadius: RADIUS.full,
   },
   chipPressed: {
-    opacity: 0.8,
+    transform: [{ scale: 0.95 }],
+    backgroundColor: COLORS.primaryLight,
   },
   chipDot: {
     width: 6,
@@ -311,9 +327,9 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   chipText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.primaryDark,
-    fontWeight: "600",
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.textPrimary,
+    fontSize: 12,
   },
   footer: {
     paddingHorizontal: SPACING.xl,
@@ -323,3 +339,4 @@ const styles = StyleSheet.create({
     borderColor: COLORS.borderSubtle,
   },
 });
+

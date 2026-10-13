@@ -5,7 +5,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 
 export type ScreenHeaderProps = {
   title: string;
@@ -48,7 +48,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 
       {tag ? (
         <View style={styles.tagContainer}>
-          <Text style={styles.tagText}>{tag}</Text>
+          <Text style={styles.tagText}>{tag.toUpperCase()}</Text>
         </View>
       ) : null}
 
@@ -61,8 +61,8 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.sm,
-    paddingBottom: SPACING.md,
+    paddingTop: SPACING.md,
+    paddingBottom: SPACING.lg,
   },
   topRow: {
     flexDirection: "row",
@@ -72,25 +72,28 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   backButton: {
-    width: 44,
-    height: 44,
+    width: 42,
+    height: 42,
     borderRadius: RADIUS.full,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
+    ...SHADOWS.subtle,
   },
   backButtonPressed: {
-    backgroundColor: COLORS.borderSubtle,
+    backgroundColor: COLORS.surfaceMuted,
+    borderColor: COLORS.borderStrong,
+    transform: [{ scale: 0.95 }],
   },
   backIcon: {
-    fontSize: 20,
+    fontSize: 18,
     color: COLORS.textPrimary,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   placeholder: {
-    width: 44,
+    width: 42,
   },
   rightSlot: {
     alignItems: "flex-end",
@@ -98,23 +101,29 @@ const styles = StyleSheet.create({
   tagContainer: {
     alignSelf: "flex-start",
     backgroundColor: COLORS.primaryLight,
+    borderWidth: 1,
+    borderColor: "#C7D2FE",
     paddingHorizontal: SPACING.md,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderRadius: RADIUS.full,
     marginBottom: SPACING.sm,
   },
   tagText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
-    fontWeight: "600",
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.primaryDark,
+    fontSize: 11,
+    letterSpacing: 0.8,
   },
   title: {
     ...TYPOGRAPHY.screenTitle,
     color: COLORS.textPrimary,
+    fontWeight: "800",
   },
   subtitle: {
     ...TYPOGRAPHY.body,
     color: COLORS.textSecondary,
     marginTop: 4,
+    fontSize: 15,
   },
 });
+

@@ -5,7 +5,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { Avatar } from "./Avatar.tsx";
 
 export type PersonRowProps = {
@@ -25,7 +25,7 @@ export const PersonRow: React.FC<PersonRowProps> = ({
 }) => {
   return (
     <View style={styles.card}>
-      <Avatar name={name} size={42} />
+      <Avatar name={name} size={44} highlight={isYou} />
 
       <View style={styles.info}>
         <View style={styles.nameRow}>
@@ -34,7 +34,7 @@ export const PersonRow: React.FC<PersonRowProps> = ({
           </Text>
           {isYou ? (
             <View style={styles.youBadge}>
-              <Text style={styles.youText}>You</Text>
+              <Text style={styles.youText}>YOU</Text>
             </View>
           ) : null}
         </View>
@@ -53,7 +53,7 @@ export const PersonRow: React.FC<PersonRowProps> = ({
             pressed && styles.removeButtonPressed,
           ]}
         >
-          <Text style={styles.removeIcon}>×</Text>
+          <Text style={styles.removeIcon}>✕</Text>
         </Pressable>
       ) : null}
     </View>
@@ -66,15 +66,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     padding: SPACING.md,
     marginBottom: SPACING.sm,
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
-    elevation: 1,
+    ...SHADOWS.subtle,
   },
   info: {
     flex: 1,
@@ -84,45 +80,55 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
+    gap: SPACING.xs,
   },
   name: {
     ...TYPOGRAPHY.bodyMedium,
     color: COLORS.textPrimary,
-    fontWeight: "600",
-    maxWidth: "80%",
+    fontWeight: "700",
+    maxWidth: "75%",
+    fontSize: 16,
   },
   youBadge: {
     backgroundColor: COLORS.primaryLight,
-    paddingHorizontal: 6,
+    borderWidth: 1,
+    borderColor: "#C7D2FE",
+    paddingHorizontal: 7,
     paddingVertical: 2,
-    borderRadius: RADIUS.sm,
-    marginLeft: SPACING.sm,
+    borderRadius: RADIUS.full,
+    marginLeft: SPACING.xs,
   },
   youText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
-    fontWeight: "600",
-    fontSize: 11,
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.primaryDark,
+    fontSize: 10,
+    letterSpacing: 0.6,
   },
   subtitle: {
     ...TYPOGRAPHY.caption,
     color: COLORS.textSecondary,
     marginTop: 2,
+    fontSize: 13,
   },
   removeButton: {
-    width: 44,
-    height: 44,
+    width: 38,
+    height: 38,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surfaceMuted,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   removeButtonPressed: {
-    backgroundColor: COLORS.borderSubtle,
+    backgroundColor: COLORS.errorLight,
+    borderColor: COLORS.errorBorder,
+    transform: [{ scale: 0.92 }],
   },
   removeIcon: {
-    fontSize: 22,
-    color: COLORS.textMuted,
-    fontWeight: "400",
-    lineHeight: 24,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    fontWeight: "700",
   },
 });
+

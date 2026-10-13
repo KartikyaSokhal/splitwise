@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 import { ScreenHeader } from "../components/ScreenHeader.tsx";
 import { CustomAmountRow } from "../components/CustomAmountRow.tsx";
 import { ReconciliationBanner } from "../components/ReconciliationBanner.tsx";
@@ -159,19 +159,25 @@ export const CustomSplitScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
     backgroundColor: COLORS.background,
     justifyContent: "space-between",
   },
   totalBadge: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     paddingHorizontal: SPACING.md,
-    paddingVertical: 5,
+    paddingVertical: 4,
     borderRadius: RADIUS.full,
   },
   totalBadgeText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
-    fontWeight: "700",
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.primaryDark,
+    fontSize: 12,
+    fontVariant: ["tabular-nums"],
   },
   scrollView: {
     flex: 1,
@@ -194,43 +200,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: SPACING.md,
-    paddingVertical: 6,
+    paddingVertical: 7,
     borderRadius: RADIUS.full,
     backgroundColor: COLORS.surface,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
+    ...SHADOWS.subtle,
   },
   resetButtonText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
-    fontWeight: "700",
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.primaryDark,
+    fontSize: 12,
   },
   statCard: {
     flex: 1,
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
+    borderRadius: RADIUS.card,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
     padding: SPACING.md,
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
-    elevation: 1,
+    ...SHADOWS.subtle,
   },
   statLabel: {
     ...TYPOGRAPHY.caption,
     color: COLORS.textSecondary,
     marginBottom: 4,
+    fontSize: 12,
   },
   statValue: {
     ...TYPOGRAPHY.section,
     color: COLORS.textPrimary,
-    fontWeight: "700",
+    fontWeight: "800",
     fontSize: 16,
   },
   statValueAccent: {
-    color: COLORS.primary,
+    color: COLORS.primaryDark,
   },
   hintText: {
     ...TYPOGRAPHY.caption,
@@ -238,6 +242,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: SPACING.sm,
     marginBottom: SPACING.sm,
+    fontSize: 12,
   },
   footer: {
     paddingHorizontal: SPACING.xl,
@@ -248,3 +253,4 @@ const styles = StyleSheet.create({
     borderColor: COLORS.borderSubtle,
   },
 });
+

@@ -7,7 +7,7 @@ import {
   StyleProp,
   ActivityIndicator,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 
 export type PrimaryButtonProps = {
   title: string;
@@ -66,7 +66,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    minHeight: 54,
+    minHeight: 52,
     paddingVertical: SPACING.md,
     backgroundColor: COLORS.primary,
     borderRadius: RADIUS.lg,
@@ -74,29 +74,38 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: SPACING.xl,
+    borderWidth: 1,
+    borderColor: "#4338CA",
+    ...SHADOWS.card,
   },
   pressed: {
     backgroundColor: COLORS.primaryDark,
-    opacity: 0.95,
+    transform: [{ scale: 0.98 }],
+    opacity: 0.94,
   },
   disabled: {
     backgroundColor: COLORS.border,
+    borderColor: COLORS.border,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   text: {
     flexShrink: 1,
     textAlign: "center",
     ...TYPOGRAPHY.bodyMedium,
     color: "#FFFFFF",
-    fontWeight: "600",
+    fontWeight: "700",
     fontSize: 16,
+    letterSpacing: 0.2,
   },
   textDisabled: {
-    color: COLORS.textMuted,
+    color: COLORS.textTertiary,
   },
   icon: {
     color: "#FFFFFF",
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     marginLeft: SPACING.sm,
   },
 });
+

@@ -6,7 +6,7 @@ import {
   ViewStyle,
   StyleProp,
 } from "react-native";
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from "../constants/theme.ts";
 
 export type SecondaryButtonProps = {
   title: string;
@@ -55,22 +55,28 @@ export const SecondaryButton: React.FC<SecondaryButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    minHeight: 54,
+    minHeight: 50,
     paddingVertical: SPACING.md,
     backgroundColor: COLORS.surface,
     borderColor: COLORS.border,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderRadius: RADIUS.lg,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: SPACING.xl,
+    ...SHADOWS.subtle,
   },
   pressed: {
-    backgroundColor: COLORS.borderSubtle,
+    backgroundColor: COLORS.surfaceMuted,
+    borderColor: COLORS.borderStrong,
+    transform: [{ scale: 0.98 }],
   },
   disabled: {
-    opacity: 0.6,
+    opacity: 0.5,
+    borderColor: COLORS.borderSubtle,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   iconLeft: {
     fontSize: 16,
@@ -82,20 +88,21 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodyMedium,
     color: COLORS.textPrimary,
     fontWeight: "600",
-    fontSize: 16,
+    fontSize: 15,
   },
   textDisabled: {
     color: COLORS.textMuted,
   },
   badge: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
+    color: COLORS.primaryDark,
     backgroundColor: COLORS.primaryLight,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 2,
     borderRadius: RADIUS.full,
     marginLeft: SPACING.sm,
-    fontWeight: "600",
+    fontWeight: "700",
     overflow: "hidden",
   },
 });
+

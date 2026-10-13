@@ -18,9 +18,19 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({
       accessibilityRole="text"
       accessibilityLabel={`Step ${currentStep} of ${totalSteps}`}
     >
-      <View style={styles.dot} />
+      <View style={styles.barsRow}>
+        {Array.from({ length: totalSteps }).map((_, i) => (
+          <View
+            key={i}
+            style={[
+              styles.stepBar,
+              i + 1 <= currentStep ? styles.stepBarActive : null,
+            ]}
+          />
+        ))}
+      </View>
       <Text style={styles.text}>
-        Step {currentStep} of {totalSteps}
+        {currentStep}/{totalSteps}
       </Text>
     </View>
   );
@@ -30,21 +40,33 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     paddingHorizontal: SPACING.md,
     paddingVertical: 5,
     borderRadius: RADIUS.full,
+    gap: SPACING.sm,
   },
-  dot: {
-    width: 6,
-    height: 6,
+  barsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+  },
+  stepBar: {
+    width: 10,
+    height: 4,
     borderRadius: RADIUS.full,
+    backgroundColor: COLORS.border,
+  },
+  stepBarActive: {
     backgroundColor: COLORS.primary,
-    marginRight: 6,
+    width: 14,
   },
   text: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.primary,
-    fontWeight: "600",
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.primaryDark,
+    fontSize: 11,
   },
 });
+

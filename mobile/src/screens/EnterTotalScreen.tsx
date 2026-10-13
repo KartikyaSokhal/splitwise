@@ -71,6 +71,9 @@ export const EnterTotalScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
     backgroundColor: COLORS.background,
     justifyContent: "space-between",
     paddingBottom: SPACING.lg,
@@ -80,6 +83,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
   },
   errorWrapper: {
     width: "100%",
@@ -87,6 +91,7 @@ const styles = StyleSheet.create({
   },
   keypadSection: {
     width: "100%",
+    paddingHorizontal: SPACING.md,
     paddingBottom: SPACING.sm,
   },
   footer: {
@@ -94,3 +99,4 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.xs,
   },
 });
+
