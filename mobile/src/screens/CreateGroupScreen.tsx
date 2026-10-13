@@ -287,8 +287,10 @@ export function CreateGroupScreen({
               </View>
             </View>
 
-            <SecondaryButton
-              title="Add person"
+            <Pressable
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Add person"
               disabled={
                 !editable ||
                 !isValidLabel(personText) ||
@@ -298,7 +300,23 @@ export function CreateGroupScreen({
                 setForm((f) => ({ ...f, people: [...f.people, personText] }));
                 setPersonText("");
               }}
-            />
+              style={({ pressed }) => [
+                styles.addPersonButton,
+                (!editable || !isValidLabel(personText) || form.people.length >= 199) &&
+                  styles.addPersonButtonDisabled,
+                pressed && styles.addPersonButtonPressed,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.addPersonButtonText,
+                  (!editable || !isValidLabel(personText) || form.people.length >= 199) &&
+                    styles.addPersonButtonTextDisabled,
+                ]}
+              >
+                Add person
+              </Text>
+            </Pressable>
 
             <View style={styles.rosterList}>
               <View style={styles.adminMemberRow}>
@@ -319,16 +337,25 @@ export function CreateGroupScreen({
                     <Text style={styles.memberName}>{name}</Text>
                     <Text style={styles.memberRole}>Member</Text>
                   </View>
-                  <SecondaryButton
-                    title={`Remove ${name}`}
+                  <Pressable
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remove ${name}`}
                     disabled={!editable}
+                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                     onPress={() =>
                       setForm((f) => ({
                         ...f,
                         people: f.people.filter((_, i) => i !== index),
                       }))
                     }
-                  />
+                    style={({ pressed }) => [
+                      styles.removePersonButton,
+                      pressed && styles.removePersonButtonPressed,
+                    ]}
+                  >
+                    <Text style={styles.removePersonIcon}>✕</Text>
+                  </Pressable>
                 </View>
               ))}
             </View>
@@ -566,6 +593,58 @@ const styles = StyleSheet.create({
   addPersonInputRow: {
     flexDirection: "row",
     gap: SPACING.sm,
+  },
+  addPersonButton: {
+    minHeight: 48,
+    backgroundColor: COLORS.electricMint,
+    borderRadius: RADIUS.pill,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: SPACING.xl,
+    borderWidth: 1,
+    borderColor: COLORS.freshGreen,
+    ...SHADOWS.subtle,
+  },
+  addPersonButtonDisabled: {
+    backgroundColor: COLORS.surfaceMuted,
+    borderColor: COLORS.borderSubtle,
+    opacity: 0.5,
+  },
+  addPersonButtonPressed: {
+    backgroundColor: COLORS.freshGreen,
+    transform: [{ scale: 0.98 }],
+  },
+  addPersonButtonText: {
+    ...TYPOGRAPHY.bodyMedium,
+    color: COLORS.midnight,
+    fontWeight: "800",
+    fontSize: 15,
+  },
+  addPersonButtonTextDisabled: {
+    color: COLORS.textMuted,
+  },
+  removePersonButton: {
+    width: 36,
+    height: 36,
+    borderRadius: RADIUS.full,
+    backgroundColor: "#EF4444",
+    borderWidth: 1,
+    borderColor: "#DC2626",
+    alignItems: "center",
+    justifyContent: "center",
+    ...SHADOWS.subtle,
+  },
+  removePersonButtonPressed: {
+    backgroundColor: "#B91C1C",
+    borderColor: "#991B1B",
+    transform: [{ scale: 0.92 }],
+  },
+  removePersonIcon: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    fontWeight: "900",
+    lineHeight: 16,
   },
   rosterList: {
     gap: SPACING.sm,
