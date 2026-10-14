@@ -463,3 +463,49 @@ test("mounted action suppresses duplicate taps and cannot navigate after unmount
   });
   assert.equal(navigation, 0);
 });
+test("mounted authenticated Home displays greeting, real groups, net position, and quick split", async () => {
+  const customGroup: GroupSnapshot = {
+    ...group,
+    balances: [
+      { personId: a, balanceMinor: 45000 },
+      { personId: b, balanceMinor: -45000 },
+    ],
+  };
+  auth = {
+    user: { id: user },
+    generation: 1,
+    configured: true,
+    busy: false,
+    message: null,
+    signIn: async () => {},
+    logout: async () => {},
+  };
+  repo = new CloudRepository(user, async (name) => {
+    if (name === "split_list_groups") return [dto(customGroup)];
+    if (name === "split_group_snapshot") return dto(customGroup);
+    throw new Error(`Unexpected operation: ${name}`);
+  });
+  let bill: ReturnType<typeof useBill>;
+  function Capture() {
+    bill = useBill();
+    return null;
+  }
+  const root = await mount(
+    <BillProvider>
+      <Capture />
+      <HomeScreen />
+    </BillProvider>,
+  );
+  await flush();
+  assert.match(text(root), /Welcome back/);
+  assert.match(text(root), /Trip/);
+  assert.match(text(root), /You're owed ₹450\.00/);
+  assert(button(root, "Create a group"));
+  await act(async () =>
+    button(root, "Quick Split, no account needed").props.onPress(),
+  );
+  assert.equal(bill!.currentScreen, "ENTER_TOTAL");
+  await act(async () => root.unmount());
+  repo.dispose();
+});
+

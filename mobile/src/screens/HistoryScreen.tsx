@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { FlatList, Pressable, View, Text, StyleSheet } from "react-native";
+import { FlatList, Pressable, View, Text, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import type { CloudRepository } from "../cloud/repository.ts";
 import type { Cursor, HistoryEvent } from "../cloud/contracts.ts";
 import { usePage } from "../cloud/hooks.ts";
@@ -25,11 +25,15 @@ export function HistoryList({
   repository,
   groupId,
   open,
+  style,
+  contentContainerStyle,
 }: {
   repository: CloudRepository;
   groupId: string | null;
   open: (event: HistoryEvent) => void;
-  }) {
+  style?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
+}) {
   const page = usePage(
     useCallback(
       (c: Cursor | null) => repository.history(groupId, c),
@@ -41,7 +45,12 @@ export function HistoryList({
     <FlatList
       data={page.loading ? [] : (page.data?.items ?? [])}
       keyExtractor={(e) => `${e.kind}:${e.id}`}
-      contentContainerStyle={ui.content}
+      style={[{ flex: 1 }, style]}
+      contentContainerStyle={[
+        ui.content,
+        { paddingBottom: SPACING.massive + 40 },
+        contentContainerStyle,
+      ]}
       ListHeaderComponent={<Notice message={page.error} retry={page.newest} />}
       ListEmptyComponent={
         page.loading ? (

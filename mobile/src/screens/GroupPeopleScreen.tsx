@@ -11,11 +11,13 @@ import { PrimaryButton } from "../components/PrimaryButton.tsx";
 import { SecondaryButton } from "../components/SecondaryButton.tsx";
 import {
   COLORS,
+  PURPOSE_CONFIG,
   RADIUS,
   SHADOWS,
   SPACING,
   TYPOGRAPHY,
 } from "../constants/theme.ts";
+import { formatCalendarDate, purposeLabel } from "../cloud/groupSetup.ts";
 
 export function GroupPeopleScreen({
   repository,
@@ -213,64 +215,173 @@ export function GroupSettingsScreen({
   const [name, setName] = useState(group.name),
     action = useAction();
 
+  const me = group.people.find(
+    (p) => p.user_id === repository.userId && p.active,
+  );
+  const isAdmin = me?.role === "admin";
+  const purposeMeta =
+    PURPOSE_CONFIG[group.purpose as keyof typeof PURPOSE_CONFIG] ??
+    PURPOSE_CONFIG.general;
+
+  const activeMembers = group.people.filter((p) => p.active);
+
   return (
-    <PageShell title="Group settings" back={back}>
+    <PageShell title="Group settings" subtitle={group.name} back={back}>
       <View style={styles.container}>
+        {/* Purpose & Trip Metadata Card */}
         <View style={styles.card}>
-          <Text style={styles.cardHeaderTag}>GROUP DETAILS</Text>
-          <Field
-            label="Group name"
-            value={name}
-            onChangeText={setName}
-            maxLength={100}
-          />
+          <Text style={styles.cardHeaderTag}>PURPOSE & METADATA</Text>
+          <View
+            style={[
+              styles.purposeSettingsPill,
+              { backgroundColor: purposeMeta.bg },
+            ]}
+          >
+            <Text
+              style={[
+                styles.purposeSettingsIcon,
+                { color: purposeMeta.color },
+              ]}
+            >
+              {purposeMeta.icon}
+            </Text>
+            <Text
+              style={[
+                styles.purposeSettingsLabel,
+                { color: purposeMeta.color },
+              ]}
+            >
+              {purposeLabel(group.purpose)}
+            </Text>
+          </View>
+
+          {group.destination ? (
+            <Text style={styles.settingsMetaText}>
+              📍 Destination: <Text style={{ fontWeight: "700", color: COLORS.textPrimary }}>{group.destination}</Text>
+            </Text>
+          ) : null}
+
+          {group.start_date || group.end_date ? (
+            <Text style={styles.settingsMetaText}>
+              🗓 Dates:{" "}
+              <Text style={{ fontWeight: "600", color: COLORS.textPrimary }}>
+                {group.start_date
+                  ? formatCalendarDate(group.start_date)
+                  : "Start not set"}{" "}
+                –{" "}
+                {group.end_date
+                  ? formatCalendarDate(group.end_date)
+                  : "End not set"}
+              </Text>
+            </Text>
+          ) : null}
+
+          <Text style={styles.helperText}>
+            Status: {group.archived ? "Archived (read-only)" : "Active ledger"}
+          </Text>
+        </View>
+
+        {/* Group Name Editing / Display */}
+        <View style={styles.card}>
+          <Text style={styles.cardHeaderTag}>GROUP NAME</Text>
+          {isAdmin && !group.archived ? (
+            <>
+              <Field
+                label="Group name"
+                value={name}
+                onChangeText={setName}
+                maxLength={100}
+              />
+              <PrimaryButton
+                title="Save name"
+                loading={action.busy}
+                disabled={!isValidLabel(name) || name.trim() === group.name}
+                onPress={() =>
+                  void action.run(
+                    () => repository.updateGroup(group.id, name.trim(), false),
+                    done,
+                  )
+                }
+              />
+            </>
+          ) : (
+            <View style={{ gap: 4 }}>
+              <Text style={styles.settingsReadonlyValue}>{group.name}</Text>
+              <Text style={styles.helperText}>
+                {group.archived
+                  ? "Group is archived and cannot be renamed."
+                  : "Only group admins can change the group name."}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Members & Roles Summary */}
+        <View style={styles.card}>
+          <Text style={styles.cardHeaderTag}>
+            MEMBERS ({activeMembers.length} ACTIVE)
+          </Text>
+          <View style={styles.memberListPreview}>
+            {activeMembers.map((m) => (
+              <View key={m.id} style={styles.memberPreviewRow}>
+                <Text style={styles.memberPreviewName}>
+                  {m.name}
+                  {m.id === me?.id ? " (You)" : ""}
+                </Text>
+                <Text
+                  style={[
+                    styles.memberPreviewRole,
+                    m.role === "admin" && { color: COLORS.electricMint },
+                  ]}
+                >
+                  {m.role === "admin" ? "Admin" : "Member"}
+                </Text>
+              </View>
+            ))}
+          </View>
+          <Text style={styles.helperText}>
+            Manage individual members, edit access, or send invitations from the
+            People tab.
+          </Text>
         </View>
 
         <Notice message={action.error} />
 
-        <PrimaryButton
-          title="Save name"
-          loading={action.busy}
-          onPress={() =>
-            void action.run(
-              () => repository.updateGroup(group.id, name, false),
-              done,
-            )
-          }
-        />
+        {/* Danger zone / Archive card (Admin only, non-archived only) */}
+        {isAdmin && !group.archived ? (
+          <View style={styles.dangerCard}>
+            <Text style={styles.dangerHeaderTag}>DANGER ZONE</Text>
+            <Text style={styles.dangerTitle}>Archive group</Text>
+            <Text style={styles.dangerNoticeText}>
+              Archive keeps history readable but permanently stops ordinary changes,
+              even if balances remain. It does not mean everyone has repaid.
+            </Text>
 
-        {/* Danger zone / Archive card */}
-        <View style={styles.dangerCard}>
-          <Text style={styles.dangerHeaderTag}>DANGER ZONE</Text>
-          <Text style={styles.dangerTitle}>Archive group</Text>
-          <Text style={styles.dangerNoticeText}>
-            Archive keeps history readable but permanently stops ordinary changes,
-            even if balances remain. It does not mean everyone has repaid.
-          </Text>
-
-          <SecondaryButton
-            title="Archive group…"
-            disabled={action.busy}
-            onPress={() =>
-              Alert.alert(
-                "Archive this group permanently?",
-                "No new expenses, repayments, invitations or corrections can be recorded. This cannot be undone in the app. History remains visible to current members.",
-                [
-                  { text: "Keep active", style: "cancel" },
-                  {
-                    text: "Archive",
-                    style: "destructive",
-                    onPress: () =>
-                      void action.run(
-                        () => repository.updateGroup(group.id, group.name, true),
-                        done,
-                      ),
-                  },
-                ],
-              )
-            }
-          />
-        </View>
+            <SecondaryButton
+              title="Archive group…"
+              disabled={action.busy}
+              onPress={() =>
+                Alert.alert(
+                  "Archive this group permanently?",
+                  "No new expenses, repayments, invitations or corrections can be recorded. This cannot be undone in the app. History remains visible to current members.",
+                  [
+                    { text: "Keep active", style: "cancel" },
+                    {
+                      text: "Archive",
+                      style: "destructive",
+                      onPress: () =>
+                        void action.run(
+                          () =>
+                            repository.updateGroup(group.id, group.name, true),
+                          done,
+                        ),
+                    },
+                  ],
+                )
+              }
+            />
+          </View>
+        ) : null}
       </View>
     </PageShell>
   );
@@ -386,6 +497,56 @@ const styles = StyleSheet.create({
     color: COLORS.errorText,
     lineHeight: 18,
     marginBottom: SPACING.xs,
+  },
+  purposeSettingsPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 5,
+    borderRadius: RADIUS.full,
+    alignSelf: "flex-start",
+    gap: 6,
+  },
+  purposeSettingsIcon: {
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  purposeSettingsLabel: {
+    ...TYPOGRAPHY.captionBold,
+    fontSize: 12,
+  },
+  settingsMetaText: {
+    ...TYPOGRAPHY.secondary,
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  settingsReadonlyValue: {
+    ...TYPOGRAPHY.section,
+    color: COLORS.textPrimary,
+    fontWeight: "700",
+    fontSize: 18,
+  },
+  memberListPreview: {
+    gap: SPACING.xs,
+    marginTop: SPACING.xs,
+  },
+  memberPreviewRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderSubtle,
+  },
+  memberPreviewName: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.textPrimary,
+    fontSize: 14,
+  },
+  memberPreviewRole: {
+    ...TYPOGRAPHY.captionBold,
+    color: COLORS.textSecondary,
+    fontSize: 11,
   },
 });
 

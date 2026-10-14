@@ -29,19 +29,26 @@ export function PageShell({
   back,
   children,
   scroll = true,
+  rightElement,
 }: {
   title: string;
   subtitle?: string;
   back: () => void;
   children: React.ReactNode;
   scroll?: boolean;
+  rightElement?: React.ReactNode;
 }) {
   return (
     <KeyboardAvoidingView
       style={ui.page}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScreenHeader title={title} subtitle={subtitle} onBack={back} />
+      <ScreenHeader
+        title={title}
+        subtitle={subtitle}
+        onBack={back}
+        rightElement={rightElement}
+      />
       {scroll ? (
         <ScrollView
           keyboardShouldPersistTaps="handled"
@@ -51,7 +58,9 @@ export function PageShell({
           {children}
         </ScrollView>
       ) : (
-        children
+        <View style={ui.bodyContainer}>
+          {children}
+        </View>
       )}
     </KeyboardAvoidingView>
   );
@@ -174,6 +183,10 @@ export const ui = StyleSheet.create({
     maxWidth: 760,
     alignSelf: "center",
     backgroundColor: COLORS.background,
+  },
+  bodyContainer: {
+    flex: 1,
+    width: "100%",
   },
   content: {
     paddingHorizontal: SPACING.xl,

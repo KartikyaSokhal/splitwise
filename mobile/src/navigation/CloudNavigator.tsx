@@ -51,7 +51,11 @@ function SignedInNavigation({
   initial: "groups" | "history";
   exit: () => void;
 }) {
-  const [stack, setStack] = useState<Route[]>([{ type: initial }]);
+  const { cloudTarget, clearCloudTarget } = useBill();
+  const [stack, setStack] = useState<Route[]>(() => {
+    if (cloudTarget) return [cloudTarget];
+    return [{ type: initial }];
+  });
   const route = stack[stack.length - 1];
   const [inspectHistory, setInspectHistory] = useState(false);
   const recovery = useResource(
@@ -64,10 +68,21 @@ function SignedInNavigation({
   useEffect(() => {
     prevStackLength.current = stack.length;
   }, [stack.length]);
+
+  useEffect(() => {
+    return () => {
+      clearCloudTarget();
+    };
+  }, [clearCloudTarget]);
+
   const back = () => {
     if (inspectHistory) setInspectHistory(false);
-    if (stack.length > 1) setStack((s) => s.slice(0, -1));
-    else exit();
+    if (stack.length > 1) {
+      setStack((s) => s.slice(0, -1));
+    } else {
+      clearCloudTarget();
+      exit();
+    }
   };
   const push = (r: Route) => setStack((s) => [...s, r]);
   useEffect(() => {
