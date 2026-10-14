@@ -157,11 +157,35 @@ export function CreateGroupScreen({
                       !editable && { opacity: 0.5 },
                     ]}
                   >
-                    <Text style={styles.purposeIcon}>{meta.icon}</Text>
+                    <View
+                      style={[
+                        styles.purposeIconBadge,
+                        {
+                          backgroundColor: isSelected
+                            ? "transparent"
+                            : COLORS.surfaceMuted,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.purposeIcon,
+                          {
+                            color: isSelected
+                              ? meta.color
+                              : COLORS.electricMint,
+                          },
+                        ]}
+                      >
+                        {meta.icon}
+                      </Text>
+                    </View>
                     <Text
                       style={[
                         styles.purposeLabel,
-                        isSelected && { color: meta.color, fontWeight: "700" },
+                        isSelected
+                          ? { color: meta.color, fontWeight: "700" }
+                          : { color: COLORS.textPrimary },
                       ]}
                     >
                       {item.label}
@@ -401,7 +425,14 @@ export function CreateGroupScreen({
                   { backgroundColor: currentPurpose.bg },
                 ]}
               >
-                <Text style={{ fontSize: 16 }}>{currentPurpose.icon}</Text>
+                <Text
+                  style={[
+                    styles.reviewPurposeIcon,
+                    { color: currentPurpose.color },
+                  ]}
+                >
+                  {currentPurpose.icon}
+                </Text>
                 <Text
                   style={[
                     styles.reviewPurposeText,
@@ -567,8 +598,20 @@ const styles = StyleSheet.create({
   purposeChipPressed: {
     transform: [{ scale: 0.96 }],
   },
+  purposeIconBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: RADIUS.full,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   purposeIcon: {
-    fontSize: 15,
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  reviewPurposeIcon: {
+    fontSize: 16,
+    fontWeight: "700",
   },
   purposeLabel: {
     ...TYPOGRAPHY.secondaryMedium,

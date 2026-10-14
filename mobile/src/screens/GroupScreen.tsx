@@ -84,416 +84,547 @@ export function GroupScreen({
     <PageShell
       title={g.name}
       back={back}
-      subtitle={
-        g.archived
-          ? "Archived · shared history is read only"
-          : isDebtor
-            ? `You owe ${currency(myBalance)}`
-            : isCreditor
-              ? `You are owed ${currency(myBalance)}`
-              : "You're balanced in this group"
-      }
       scroll={false}
+      rightElement={
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Group settings"
+          onPress={() => settings(g)}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          style={({ pressed }) => [
+            styles.settingsButton,
+            pressed && styles.settingsButtonPressed,
+          ]}
+        >
+          <Text style={styles.settingsIcon}>⚙</Text>
+        </Pressable>
+      }
     >
-      <View style={styles.topContainer}>
-        {/* Purpose & Destination Banner */}
-        <View style={styles.groupHeroCard}>
-          <View style={styles.groupHeroTop}>
-            <View
-              style={[
-                styles.purposeHeroBadge,
-                { backgroundColor: purposeMeta.bg },
-              ]}
-            >
-              <Text style={styles.purposeHeroIcon}>{purposeMeta.icon}</Text>
-              <Text
+      <View style={styles.screenWrapper}>
+        <View style={styles.topContainer}>
+          {/* Purpose & Concise Net-Balance Summary */}
+          <View style={styles.summaryCard}>
+            <View style={styles.summaryMetaRow}>
+              <View
                 style={[
-                  styles.purposeHeroLabel,
-                  { color: purposeMeta.color },
+                  styles.purposePill,
+                  { backgroundColor: purposeMeta.bg },
                 ]}
               >
-                {purposeLabel(g.purpose)}
-              </Text>
-            </View>
-            {g.archived && (
-              <View style={styles.archivedBadge}>
-                <Text style={styles.archivedBadgeText}>ARCHIVED</Text>
-              </View>
-            )}
-          </View>
-
-          {g.destination && (
-            <Text style={styles.destinationHeroText}>
-              📍 {g.destination}
-            </Text>
-          )}
-
-          {(g.start_date || g.end_date) && (
-            <Text style={styles.dateHeroText}>
-              🗓{" "}
-              {g.start_date
-                ? formatCalendarDate(g.start_date)
-                : "Start not set"}{" "}
-              – {g.end_date ? formatCalendarDate(g.end_date) : "End not set"}
-            </Text>
-          )}
-
-          {/* Net Balance Highlight */}
-          {!g.archived && (
-            <View
-              style={[
-                styles.balanceHeroBox,
-                isDebtor && styles.balanceHeroDebtor,
-                isCreditor && styles.balanceHeroCreditor,
-                !isDebtor && !isCreditor && styles.balanceHeroBalanced,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.balanceHeroCaption,
-                  isDebtor && { color: COLORS.errorText },
-                  isCreditor && { color: COLORS.successText },
-                  !isDebtor && !isCreditor && { color: COLORS.textSecondary },
-                ]}
-              >
-                {isDebtor
-                  ? "YOUR NET BALANCE (YOU OWE)"
-                  : isCreditor
-                    ? "YOUR NET BALANCE (YOU ARE OWED)"
-                    : "YOUR NET BALANCE"}
-              </Text>
-              <Text
-                style={[
-                  styles.balanceHeroAmount,
-                  isDebtor && { color: COLORS.errorText },
-                  isCreditor && { color: COLORS.successText },
-                  !isDebtor && !isCreditor && { color: COLORS.textPrimary },
-                ]}
-              >
-                {currency(myBalance)}
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {!g.archived && (
-          <PrimaryButton title="Add expense" onPress={() => expense(g)} />
-        )}
-
-        {/* Tab Selector */}
-        <View style={styles.tabBar}>
-          {(["History", "Balances", "People"] as const).map((t) => (
-            <Choice
-              key={t}
-              title={t}
-              selected={tab === t}
-              onPress={() => setTab(t)}
-            />
-          ))}
-        </View>
-      </View>
-
-      {tab === "History" ? (
-        <HistoryList repository={repository} groupId={g.id} open={openEvent} />
-      ) : tab === "People" ? (
-        <FlatList
-          data={g.people}
-          keyExtractor={(p) => p.id}
-          contentContainerStyle={ui.content}
-          ListHeaderComponent={
-            <View style={styles.peopleHeader}>
-              {admin && !g.archived && (
-                <PrimaryButton title="Add a person" onPress={() => people(g)} />
-              )}
-              <Text style={styles.helperNotice}>
-                Names are people in this group, not necessarily accounts.
-                Removed people keep their history.
-              </Text>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <View style={styles.memberCard}>
-              <Avatar name={item.name} size={42} />
-              <View style={styles.memberCardInfo}>
-                <View style={styles.memberCardNameRow}>
-                  <Text style={styles.memberCardName}>{item.name}</Text>
-                  {item.id === me?.id && (
-                    <View style={styles.youBadge}>
-                      <Text style={styles.youBadgeText}>YOU</Text>
-                    </View>
-                  )}
-                  {item.role === "admin" && (
-                    <View style={styles.adminRoleBadge}>
-                      <Text style={styles.adminRoleBadgeText}>ADMIN</Text>
-                    </View>
-                  )}
-                </View>
-                <Text style={styles.memberCardSubtext}>
-                  {item.active
-                    ? item.user_id
-                      ? "Account linked"
-                      : "Unlinked guest"
-                    : "Removed from active group"}
+                <Text
+                  style={[
+                    styles.purposePillIcon,
+                    { color: purposeMeta.color },
+                  ]}
+                >
+                  {purposeMeta.icon}
+                </Text>
+                <Text
+                  style={[
+                    styles.purposePillText,
+                    { color: purposeMeta.color },
+                  ]}
+                >
+                  {purposeLabel(g.purpose)}
                 </Text>
               </View>
-              {admin && !g.archived && (
-                <SecondaryButton
-                  title={`Manage ${item.name}`}
-                  onPress={() => people(g, item)}
-                />
-              )}
-            </View>
-          )}
-          ListFooterComponent={
-            admin && !g.archived ? (
-              <View style={{ marginTop: SPACING.sm }}>
-                <SecondaryButton
-                  title="Group settings"
-                  onPress={() => settings(g)}
-                />
-              </View>
-            ) : null
-          }
-        />
-      ) : (
-        <FlatList
-          data={g.balances}
-          keyExtractor={(b) => b.personId}
-          contentContainerStyle={ui.content}
-          ListHeaderComponent={
-            <View style={styles.balancesHeader}>
-              <Heading>Who owes what</Heading>
-              <Text style={styles.helperNotice}>
-                Balances include expenses and recorded repayments. A positive
-                balance means this person is owed money.
-              </Text>
-            </View>
-          }
-          renderItem={({ item }) => {
-            const p = person(item.personId);
-            const isPos = item.balanceMinor > 0;
-            const isNeg = item.balanceMinor < 0;
 
-            return (
-              <View style={styles.balanceCard}>
-                <Avatar name={p.name} size={40} />
-                <View style={styles.balanceCardInfo}>
-                  <Text style={styles.balancePersonName}>
-                    {p.name}
-                    {!p.active ? " · Removed" : ""}
-                  </Text>
-                  <Text style={styles.balancePersonStatus}>
-                    {isNeg ? "Owes group" : isPos ? "Owed by group" : "All settled"}
+              {g.destination ? (
+                <View style={styles.destinationPill}>
+                  <Text style={styles.destinationPillText} numberOfLines={1}>
+                    📍 {g.destination}
                   </Text>
                 </View>
+              ) : null}
+
+              {(g.start_date || g.end_date) ? (
+                <View style={styles.datePill}>
+                  <Text style={styles.datePillText} numberOfLines={1}>
+                    🗓{" "}
+                    {g.start_date
+                      ? formatCalendarDate(g.start_date)
+                      : "Start not set"}{" "}
+                    –{" "}
+                    {g.end_date
+                      ? formatCalendarDate(g.end_date)
+                      : "End not set"}
+                  </Text>
+                </View>
+              ) : null}
+
+              {g.archived ? (
+                <View style={styles.archivedPill}>
+                  <Text style={styles.archivedPillText}>ARCHIVED</Text>
+                </View>
+              ) : null}
+            </View>
+
+            {/* Net Balance Status */}
+            <View style={styles.balanceSummaryRow}>
+              <View style={styles.balanceInfo}>
+                <Text style={styles.balanceLabel}>Your balance</Text>
+                <Text
+                  style={[
+                    styles.balanceValue,
+                    isDebtor && styles.textDebtor,
+                    isCreditor && styles.textCreditor,
+                    !isDebtor && !isCreditor && styles.textSettled,
+                  ]}
+                >
+                  {g.archived
+                    ? "Read-only ledger"
+                    : isDebtor
+                      ? `You owe ${currency(myBalance)}`
+                      : isCreditor
+                        ? `You're owed ${currency(myBalance)}`
+                        : "All settled (₹0.00)"}
+                </Text>
+              </View>
+
+              {!g.archived && (
                 <View
                   style={[
-                    styles.balancePill,
-                    isNeg && styles.balancePillNegative,
-                    isPos && styles.balancePillPositive,
+                    styles.balanceBadge,
+                    isDebtor && styles.badgeDebtor,
+                    isCreditor && styles.badgeCreditor,
+                    !isDebtor && !isCreditor && styles.badgeSettled,
                   ]}
                 >
                   <Text
                     style={[
-                      styles.balancePillText,
-                      isNeg && styles.balancePillTextNeg,
-                      isPos && styles.balancePillTextPos,
+                      styles.balanceBadgeText,
+                      isDebtor && styles.badgeTextDebtor,
+                      isCreditor && styles.badgeTextCreditor,
+                      !isDebtor && !isCreditor && styles.badgeTextSettled,
                     ]}
                   >
-                    {isNeg ? `- ${currency(item.balanceMinor)}` : isPos ? `+ ${currency(item.balanceMinor)}` : "₹0.00"}
-                  </Text>
-                </View>
-              </View>
-            );
-          }}
-          ListFooterComponent={
-            <View style={styles.suggestionsContainer}>
-              <View style={styles.suggestionsHeader}>
-                <Heading>Suggested repayments</Heading>
-                <Text style={styles.helperNotice}>
-                  One way to clear the group balance. Suggestions can route debts
-                  indirectly and are not payments. Only the linked sender can
-                  record money they already repaid.
-                </Text>
-              </View>
-
-              {transfers.length === 0 && (
-                <View style={styles.balancedEmptyCard}>
-                  <Text style={{ fontSize: 24 }}>✓</Text>
-                  <Text style={styles.balancedEmptyText}>
-                    All balanced! There are no repayments to suggest.
+                    {isDebtor ? "- Owe" : isCreditor ? "+ Owed" : "✓ Settled"}
                   </Text>
                 </View>
               )}
+            </View>
+          </View>
 
-              {transfers.map((t) => {
-                const fromPerson = person(t.fromPersonId);
-                const toPerson = person(t.toPersonId);
-                const isMyRepayment = me?.id === t.fromPersonId;
+          {/* Contextual primary action based on active tab */}
+          {tab === "History" && !g.archived ? (
+            <View style={styles.actionContainer}>
+              <PrimaryButton
+                title="+ Add expense"
+                onPress={() => expense(g)}
+                accessibilityLabel="Add expense"
+              />
+            </View>
+          ) : tab === "People" && admin && !g.archived ? (
+            <View style={styles.actionContainer}>
+              <PrimaryButton
+                title="+ Add a person"
+                onPress={() => people(g)}
+                accessibilityLabel="Add a person"
+              />
+            </View>
+          ) : null}
+
+          {/* Tab Selector */}
+          <View style={styles.tabBar}>
+            {(["History", "Balances", "People"] as const).map((t) => (
+              <Choice
+                key={t}
+                title={t}
+                selected={tab === t}
+                onPress={() => setTab(t)}
+              />
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.tabContentWrapper}>
+          {tab === "History" ? (
+            <HistoryList
+              style={styles.tabList}
+              repository={repository}
+              groupId={g.id}
+              open={openEvent}
+            />
+          ) : tab === "People" ? (
+            <FlatList
+              data={g.people}
+              keyExtractor={(p) => p.id}
+              style={styles.tabList}
+              contentContainerStyle={[ui.content, styles.listPadding]}
+              ListHeaderComponent={
+                <View style={styles.peopleHeader}>
+                  <Text style={styles.helperNotice}>
+                    Names are people in this group, not necessarily accounts.
+                    Removed people keep their history.
+                  </Text>
+                </View>
+              }
+              renderItem={({ item }) => (
+                <View style={styles.memberCard}>
+                  <Avatar name={item.name} size={42} />
+                  <View style={styles.memberCardInfo}>
+                    <View style={styles.memberCardNameRow}>
+                      <Text style={styles.memberCardName}>{item.name}</Text>
+                      {item.id === me?.id && (
+                        <View style={styles.youBadge}>
+                          <Text style={styles.youBadgeText}>YOU</Text>
+                        </View>
+                      )}
+                      {item.role === "admin" && (
+                        <View style={styles.adminRoleBadge}>
+                          <Text style={styles.adminRoleBadgeText}>ADMIN</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={styles.memberCardSubtext}>
+                      {item.active
+                        ? item.user_id
+                          ? "Account linked"
+                          : "Unlinked guest"
+                        : "Removed from active group"}
+                    </Text>
+                  </View>
+                  {admin && !g.archived && (
+                    <SecondaryButton
+                      title={`Manage ${item.name}`}
+                      onPress={() => people(g, item)}
+                    />
+                  )}
+                </View>
+              )}
+            />
+          ) : (
+            <FlatList
+              data={g.balances}
+              keyExtractor={(b) => b.personId}
+              style={styles.tabList}
+              contentContainerStyle={[ui.content, styles.listPadding]}
+              ListHeaderComponent={
+                <View style={styles.balancesHeader}>
+                  <Heading>Who owes what</Heading>
+                  <Text style={styles.helperNotice}>
+                    Balances include expenses and recorded repayments. A positive
+                    balance means this person is owed money.
+                  </Text>
+                </View>
+              }
+              renderItem={({ item }) => {
+                const p = person(item.personId);
+                const isPos = item.balanceMinor > 0;
+                const isNeg = item.balanceMinor < 0;
 
                 return (
-                  <View
-                    key={`${t.fromPersonId}:${t.toPersonId}`}
-                    style={styles.transferCard}
-                  >
-                    <View style={styles.transferRoute}>
-                      <View style={styles.transferParty}>
-                        <Avatar name={fromPerson.name} size={36} />
-                        <Text style={styles.transferPartyName} numberOfLines={1}>
-                          {fromPerson.name}
-                        </Text>
-                      </View>
-                      <View style={styles.transferArrowBox}>
-                        <Text style={styles.transferArrowText}>→</Text>
-                        <Text style={styles.transferPaysTag}>pays</Text>
-                      </View>
-                      <View style={styles.transferParty}>
-                        <Avatar name={toPerson.name} size={36} />
-                        <Text style={styles.transferPartyName} numberOfLines={1}>
-                          {toPerson.name}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <View style={styles.transferAmountRow}>
-                      <Text style={styles.transferAmountText}>
-                        {currency(t.amountMinor)}
+                  <View style={styles.balanceCard}>
+                    <Avatar name={p.name} size={40} />
+                    <View style={styles.balanceCardInfo}>
+                      <Text style={styles.balancePersonName}>
+                        {p.name}
+                        {!p.active ? " · Removed" : ""}
+                      </Text>
+                      <Text style={styles.balancePersonStatus}>
+                        {isNeg ? "Owes group" : isPos ? "Owed by group" : "All settled"}
                       </Text>
                     </View>
-
-                    {!g.archived && isMyRepayment && toPerson.active && (
-                      <SecondaryButton
-                        title="Record my repayment"
-                        onPress={() => repay(g, t)}
-                      />
-                    )}
-
-                    {(!fromPerson.active || !toPerson.active) && (
-                      <Text style={styles.transferNoticeText}>
-                        An admin must reactivate removed people before new records
-                        can include them.
+                    <View
+                      style={[
+                        styles.balancePill,
+                        isNeg && styles.balancePillNegative,
+                        isPos && styles.balancePillPositive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.balancePillText,
+                          isNeg && styles.balancePillTextNeg,
+                          isPos && styles.balancePillTextPos,
+                        ]}
+                      >
+                        {isNeg ? `- ${currency(item.balanceMinor)}` : isPos ? `+ ${currency(item.balanceMinor)}` : "₹0.00"}
                       </Text>
-                    )}
-
-                    {!fromPerson.user_id && (
-                      <Text style={styles.transferNoticeText}>
-                        This sender needs a linked account to record their
-                        repayment.
-                      </Text>
-                    )}
+                    </View>
                   </View>
                 );
-              })}
+              }}
+              ListFooterComponent={
+                <View style={styles.suggestionsContainer}>
+                  <View style={styles.suggestionsHeader}>
+                    <Heading>Suggested repayments</Heading>
+                    <Text style={styles.helperNotice}>
+                      One way to clear the group balance. Suggestions can route debts
+                      indirectly and are not payments. Only the linked sender can
+                      record money they already repaid.
+                    </Text>
+                  </View>
 
-              <View style={{ marginTop: SPACING.xs }}>
-                <SecondaryButton
-                  title="Refresh balances"
-                  onPress={() => void resource.reload()}
-                />
-              </View>
-            </View>
-          }
-        />
-      )}
+                  {transfers.length === 0 && (
+                    <View style={styles.balancedEmptyCard}>
+                      <Text style={{ fontSize: 24, color: COLORS.freshGreen }}>✓</Text>
+                      <Text style={styles.balancedEmptyText}>
+                        All balanced! There are no repayments to suggest.
+                      </Text>
+                    </View>
+                  )}
+
+                  {transfers.map((t) => {
+                    const fromPerson = person(t.fromPersonId);
+                    const toPerson = person(t.toPersonId);
+                    const isMyRepayment = me?.id === t.fromPersonId;
+
+                    return (
+                      <View
+                        key={`${t.fromPersonId}:${t.toPersonId}`}
+                        style={styles.transferCard}
+                      >
+                        <View style={styles.transferRoute}>
+                          <View style={styles.transferParty}>
+                            <Avatar name={fromPerson.name} size={36} />
+                            <Text style={styles.transferPartyName} numberOfLines={1}>
+                              {fromPerson.name}
+                            </Text>
+                          </View>
+                          <View style={styles.transferArrowBox}>
+                            <Text style={styles.transferArrowText}>→</Text>
+                            <Text style={styles.transferPaysTag}>pays</Text>
+                          </View>
+                          <View style={styles.transferParty}>
+                            <Avatar name={toPerson.name} size={36} />
+                            <Text style={styles.transferPartyName} numberOfLines={1}>
+                              {toPerson.name}
+                            </Text>
+                          </View>
+                        </View>
+
+                        <View style={styles.transferAmountRow}>
+                          <Text style={styles.transferAmountText}>
+                            {currency(t.amountMinor)}
+                          </Text>
+                        </View>
+
+                        {!g.archived && isMyRepayment && toPerson.active && (
+                          <SecondaryButton
+                            title="Record my repayment"
+                            onPress={() => repay(g, t)}
+                          />
+                        )}
+
+                        {(!fromPerson.active || !toPerson.active) && (
+                          <Text style={styles.transferNoticeText}>
+                            An admin must reactivate removed people before new records
+                            can include them.
+                          </Text>
+                        )}
+
+                        {!fromPerson.user_id && (
+                          <Text style={styles.transferNoticeText}>
+                            This sender needs a linked account to record their
+                            repayment.
+                          </Text>
+                        )}
+                      </View>
+                    );
+                  })}
+
+                  <View style={{ marginTop: SPACING.xs }}>
+                    <SecondaryButton
+                      title="Refresh balances"
+                      onPress={() => void resource.reload()}
+                    />
+                  </View>
+                </View>
+              }
+            />
+          )}
+        </View>
+      </View>
     </PageShell>
   );
 }
 
 const styles = StyleSheet.create({
+  settingsButton: {
+    width: 42,
+    height: 42,
+    borderRadius: RADIUS.full,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.surface,
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
+    ...SHADOWS.subtle,
+  },
+  settingsButtonPressed: {
+    backgroundColor: COLORS.surfaceMuted,
+    borderColor: COLORS.borderStrong,
+    transform: [{ scale: 0.95 }],
+  },
+  settingsIcon: {
+    fontSize: 18,
+    color: COLORS.electricMint,
+    fontWeight: "700",
+  },
+  screenWrapper: {
+    flex: 1,
+    width: "100%",
+  },
   topContainer: {
     paddingHorizontal: SPACING.xl,
-    gap: SPACING.md,
+    gap: SPACING.sm,
     marginBottom: SPACING.xs,
   },
-  groupHeroCard: {
+  summaryCard: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.card,
     borderWidth: 1.5,
     borderColor: COLORS.border,
-    padding: SPACING.lg,
+    padding: SPACING.md,
     gap: SPACING.sm,
     ...SHADOWS.subtle,
   },
-  groupHeroTop: {
+  summaryMetaRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: SPACING.xs,
   },
-  purposeHeroBadge: {
+  purposePill: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
     borderRadius: RADIUS.full,
-    gap: 6,
+    gap: 5,
   },
-  purposeHeroIcon: {
-    fontSize: 14,
+  purposePillIcon: {
+    fontSize: 12,
   },
-  purposeHeroLabel: {
+  purposePillText: {
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 0.2,
   },
-  archivedBadge: {
+  destinationPill: {
     backgroundColor: COLORS.surfaceMuted,
     paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: RADIUS.full,
   },
-  archivedBadgeText: {
+  destinationPillText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: COLORS.freshGreen,
+  },
+  datePill: {
+    backgroundColor: COLORS.surfaceMuted,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 3,
+    borderRadius: RADIUS.full,
+  },
+  datePillText: {
+    fontSize: 11,
+    fontWeight: "500",
+    color: COLORS.textSecondary,
+  },
+  archivedPill: {
+    backgroundColor: COLORS.surfaceMuted,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 3,
+    borderRadius: RADIUS.full,
+  },
+  archivedPillText: {
     fontSize: 10,
     fontWeight: "700",
     color: COLORS.textSecondary,
     letterSpacing: 0.5,
   },
-  destinationHeroText: {
-    ...TYPOGRAPHY.section,
-    fontSize: 17,
-    fontWeight: "700",
-    color: COLORS.textPrimary,
-  },
-  dateHeroText: {
-    ...TYPOGRAPHY.secondary,
-    color: COLORS.textSecondary,
-  },
-  balanceHeroBox: {
-    padding: SPACING.md,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1.5,
-    marginTop: SPACING.xs,
+  balanceSummaryRow: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 2,
+    gap: SPACING.sm,
+  },
+  balanceInfo: {
+    flex: 1,
     gap: 2,
   },
-  balanceHeroDebtor: {
+  balanceLabel: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textSecondary,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    fontWeight: "700",
+  },
+  balanceValue: {
+    ...TYPOGRAPHY.section,
+    fontWeight: "800",
+    fontSize: 18,
+    fontVariant: ["tabular-nums"],
+  },
+  textDebtor: {
+    color: COLORS.errorText,
+  },
+  textCreditor: {
+    color: COLORS.electricMint,
+  },
+  textSettled: {
+    color: COLORS.textPrimary,
+  },
+  balanceBadge: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 4,
+    borderRadius: RADIUS.full,
+    borderWidth: 1,
+  },
+  badgeDebtor: {
     backgroundColor: COLORS.errorLight,
     borderColor: COLORS.errorBorder,
   },
-  balanceHeroCreditor: {
+  badgeCreditor: {
     backgroundColor: COLORS.successLight,
     borderColor: COLORS.successBorder,
   },
-  balanceHeroBalanced: {
+  badgeSettled: {
     backgroundColor: COLORS.surfaceMuted,
     borderColor: COLORS.border,
   },
-  balanceHeroCaption: {
-    fontSize: 10,
-    fontWeight: "800",
-    letterSpacing: 0.6,
+  balanceBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
   },
-  balanceHeroAmount: {
-    ...TYPOGRAPHY.numericHero,
-    fontSize: 28,
-    lineHeight: 34,
+  badgeTextDebtor: {
+    fontSize: 11,
     fontWeight: "800",
-    fontVariant: ["tabular-nums"],
+    color: COLORS.errorText,
+  },
+  badgeTextCreditor: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: COLORS.electricMint,
+  },
+  badgeTextSettled: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: COLORS.textSecondary,
+  },
+  actionContainer: {
+    marginTop: 2,
   },
   tabBar: {
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
     gap: SPACING.sm,
+  },
+  tabContentWrapper: {
+    flex: 1,
+    width: "100%",
+  },
+  tabList: {
+    flex: 1,
+  },
+  listPadding: {
+    paddingBottom: SPACING.massive + 40,
   },
   peopleHeader: {
     gap: SPACING.sm,

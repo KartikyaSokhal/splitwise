@@ -20,12 +20,22 @@ import {
 } from "./splitLogic.ts";
 import type { CustomSplitReconciliation } from "../utils/split.ts";
 
+export type CloudTarget =
+  | { type: "group"; id: string }
+  | { type: "create" }
+  | null;
+
 export type BillContextType = {
   currentScreen: ScreenName;
   screenHistory: ScreenName[];
   navigate: (screen: ScreenName) => void;
   goBack: () => void;
   canGoBack: boolean;
+
+  cloudTarget: CloudTarget;
+  openCloudGroup: (id: string) => void;
+  openCloudCreate: () => void;
+  clearCloudTarget: () => void;
 
   totalInput: string;
   totalMinor: number | null;
@@ -64,6 +74,7 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [screenHistory, setScreenHistory] = useState<ScreenName[]>(["HOME"]);
   const currentScreen = screenHistory[screenHistory.length - 1] ?? "HOME";
+  const [cloudTarget, setCloudTarget] = useState<CloudTarget>(null);
 
   const [totalInput, setTotalInputState] = useState<string>("");
   const [people, setPeople] = useState<Person[]>([]);
@@ -82,6 +93,20 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const canGoBack = screenHistory.length > 1 && currentScreen !== "HOME";
+
+  const openCloudGroup = useCallback((id: string) => {
+    setCloudTarget({ type: "group", id });
+    navigate("GROUPS");
+  }, [navigate]);
+
+  const openCloudCreate = useCallback(() => {
+    setCloudTarget({ type: "create" });
+    navigate("GROUPS");
+  }, [navigate]);
+
+  const clearCloudTarget = useCallback(() => {
+    setCloudTarget(null);
+  }, []);
 
   // Parse totalMinor safely
   const { totalMinor, totalError } = useMemo(() => {
@@ -314,6 +339,10 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
       navigate,
       goBack,
       canGoBack,
+      cloudTarget,
+      openCloudGroup,
+      openCloudCreate,
+      clearCloudTarget,
       totalInput,
       totalMinor,
       totalError,
@@ -344,6 +373,10 @@ export const BillProvider: React.FC<{ children: React.ReactNode }> = ({
       navigate,
       goBack,
       canGoBack,
+      cloudTarget,
+      openCloudGroup,
+      openCloudCreate,
+      clearCloudTarget,
       totalInput,
       totalMinor,
       totalError,

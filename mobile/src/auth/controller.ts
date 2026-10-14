@@ -5,6 +5,7 @@ export type AuthState = {
   message: string | null;
   configured: boolean;
   generation: number;
+  restored: boolean;
 };
 export class LoginCancelled extends Error {}
 export class RevocationUnconfirmed extends Error {}
@@ -28,6 +29,7 @@ export class AuthController {
       message: null,
       configured: port !== null,
       generation: 0,
+      restored: port === null,
     };
   }
   getSnapshot = () => this.state;
@@ -42,7 +44,11 @@ export class AuthController {
     for (const listener of this.listeners) listener();
   }
   async restore() {
-    await this.run(() => this.port!.restore(), true);
+    try {
+      await this.run(() => this.port!.restore(), true);
+    } finally {
+      this.publish({ restored: true });
+    }
   }
   async signIn(provider: "google" | "apple") {
     await this.run(() => this.port![provider]());
@@ -80,7 +86,7 @@ export class AuthController {
   }
   async logout() {
     ++this.epoch;
-    this.publish({ user: null, busy: true, message: null, generation: this.state.generation + 1 });
+    this.publish({ user: null, busy: true, message: null, generation: this.state.generation + 1, restored: true });
     try {
       await this.port?.logout();
     } catch (error) {
@@ -91,11 +97,11 @@ export class AuthController {
             : "Device session cleanup failed. Retry sign out before sharing this device.",
       });
     } finally {
-      this.publish({ busy: false });
+      this.publish({ busy: false, restored: true });
     }
   }
   signedOut = () => {
     ++this.epoch;
-    this.publish({ user: null, busy: false, generation: this.state.generation + 1 });
+    this.publish({ user: null, busy: false, generation: this.state.generation + 1, restored: true });
   };
 }
