@@ -11,6 +11,7 @@ import { StepIndicator } from "../components/StepIndicator.tsx";
 import { SplitOptionCard } from "../components/SplitOptionCard.tsx";
 import { PrimaryButton } from "../components/PrimaryButton.tsx";
 import { useBill } from "../state/BillContext.tsx";
+import { calculateEqualSplit } from "../state/splitLogic.ts";
 import { formatMinorAsInr } from "../utils/money.ts";
 
 export const SplitMethodScreen: React.FC = () => {
@@ -19,20 +20,23 @@ export const SplitMethodScreen: React.FC = () => {
     people,
     splitMethod,
     setSplitMethod,
-    calculatedShares,
     navigate,
     goBack,
   } = useBill();
 
   const formattedTotal = totalMinor !== null ? formatMinorAsInr(totalMinor) : "0.00";
 
-  // Per person calculation for equal option preview
-  const equalPerPerson =
-    calculatedShares.length > 0 && splitMethod === "equal"
-      ? calculatedShares[0].formattedShare
-      : totalMinor !== null && people.length > 0
-        ? formatMinorAsInr(Math.floor(totalMinor / people.length))
-        : "0.00";
+  // Preview the actual engine result even if Custom is currently selected.
+  const equalPreview = totalMinor !== null ? calculateEqualSplit(totalMinor, people) : [];
+  const first = equalPreview[0];
+  const last = equalPreview[equalPreview.length - 1];
+  const hasRemainder = Boolean(first && last && first.shareMinor !== last.shareMinor);
+  const equalBadge = hasRemainder
+    ? `₹${last?.formattedShare}–₹${first?.formattedShare} per person (${people.length} people)`
+    : `₹${first?.formattedShare ?? "0.00"} each (${people.length} people)`;
+  const equalSubtitle = hasRemainder
+    ? "Nearly equal; first people receive leftover paise"
+    : "Everyone pays the same amount";
 
   const handleContinue = () => {
     if (splitMethod === "equal") {
@@ -60,11 +64,11 @@ export const SplitMethodScreen: React.FC = () => {
           selected={splitMethod === "equal"}
           onSelect={() => setSplitMethod("equal")}
           title="Equal"
-          subtitle="Everyone pays the same amount"
+          subtitle={equalSubtitle}
           icon="👥"
           badgeIcon="🧮"
-          badgeText={`₹${equalPerPerson} / person (${people.length} people)`}
-          accessibilityLabel="Equal split: everyone pays the same amount"
+          badgeText={equalBadge}
+          accessibilityLabel={`Equal split: ${equalSubtitle}. ${equalBadge}`}
         />
 
         {/* Custom Option */}
@@ -198,7 +202,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     ...TYPOGRAPHY.section,
-    color: COLORS.primaryDark,
+    color: COLORS.primary,
     fontWeight: "800",
     fontVariant: ["tabular-nums"],
   },

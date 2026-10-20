@@ -178,8 +178,8 @@ function AuthenticatedHomeContent({
           );
           const balanceMinor = me
             ? (snap.balances.find((b) => b.personId === me.id)?.balanceMinor ??
-              0)
-            : 0;
+              null)
+            : null;
           return { group: g, balanceMinor };
         } catch {
           return { group: g, balanceMinor: null };
@@ -526,6 +526,7 @@ function GuestHomeContent() {
 export const HomeScreen: React.FC = () => {
   const { user, configured, restored } = useAuth();
   const repository = useCloud();
+  const { navigate } = useBill();
 
   // Prevent flash of guest landing page while cold-start session is restoring
   if (configured && restored === false) {
@@ -539,6 +540,14 @@ export const HomeScreen: React.FC = () => {
           size="small"
           color={COLORS.electricMint}
           style={{ marginTop: SPACING.md }}
+        />
+        <Text style={styles.caption}>
+          Checking saved groups. Quick Split works offline.
+        </Text>
+        <PrimaryButton
+          title="Quick Split"
+          accessibilityLabel="Quick Split while account restores"
+          onPress={() => navigate("ENTER_TOTAL")}
         />
       </View>
     );

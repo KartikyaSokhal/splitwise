@@ -18,7 +18,7 @@ export default function App() {
             style={styles.safeArea}
             edges={["top", "bottom", "left", "right"]}
           >
-            <StatusBar style="dark" />
+            <StatusBar style="light" />
             <View style={styles.container}>
               <RootNavigator />
             </View>

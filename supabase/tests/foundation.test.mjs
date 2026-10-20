@@ -603,6 +603,24 @@ test("only the linked sender may record repayment; not a suggestion or third-par
   );
   assert((await balance()).every((b) => b.balance_minor === "0"));
 });
+test("recorded debtor-to-creditor repayments move both balances toward zero", async () => {
+  await joinC();
+  await payExpense(A, ga, pa, guest, 100);
+  const before = await balance();
+  assert.equal(before.find((b) => b.person_id === guest).balance_minor, "-100");
+  assert.equal(before.find((b) => b.person_id === pa).balance_minor, "100");
+
+  await rpc(C, "split_record_settlement", [ga, randomUUID(), guest, pa, 40]);
+  const partial = await balance();
+  assert.equal(partial.find((b) => b.person_id === guest).balance_minor, "-60");
+  assert.equal(partial.find((b) => b.person_id === pa).balance_minor, "60");
+
+  await rpc(C, "split_record_settlement", [ga, randomUUID(), guest, pa, 60]);
+  const exact = await balance();
+  assert.equal(exact.find((b) => b.person_id === guest).balance_minor, "0");
+  assert.equal(exact.find((b) => b.person_id === pa).balance_minor, "0");
+  assert.equal(exact.reduce((sum, b) => sum + BigInt(b.balance_minor), 0n), 0n);
+});
 test("settlement reversal is append-only, authorized, idempotent and has correct signs", async () => {
   await joinC();
   await payExpense();
