@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
   countText: {
     ...TYPOGRAPHY.captionBold,
-    color: COLORS.primaryDark,
+    color: COLORS.primary,
     fontSize: 11,
   },
   scrollView: {

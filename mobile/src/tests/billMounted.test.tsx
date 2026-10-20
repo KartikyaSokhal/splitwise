@@ -98,6 +98,44 @@ mock.module("react-native", {
   },
 });
 const { ReviewScreen } = await import("../screens/ReviewScreen.tsx");
+const { SplitMethodScreen } = await import("../screens/SplitMethodScreen.tsx");
+test("mounted Equal preview does not claim identical paise when a remainder exists", async () => {
+  let root!: ReactTestRenderer;
+  await act(async () => {
+    root = create(<BillProvider><Capture /><SplitMethodScreen /></BillProvider>);
+  });
+  await act(async () => {
+    current.setTotalInput("10.01");
+    current.addPerson("A");
+    current.addPerson("B");
+    current.addPerson("C");
+  });
+  const view = JSON.stringify(root.toJSON());
+  assert.match(view, /₹3\.34/);
+  assert.match(view, /₹3\.33/);
+  assert(!view.includes("Everyone pays the same amount"));
+  await act(async () => current.setSplitMethod("custom"));
+  const customSelected = JSON.stringify(root.toJSON());
+  assert.match(customSelected, /₹3\.33/);
+  assert.match(customSelected, /₹3\.34/);
+  await act(async () => root.unmount());
+});
+test("mounted Equal preview keeps a single amount when every share is identical", async () => {
+  let root!: ReactTestRenderer;
+  await act(async () => {
+    root = create(<BillProvider><Capture /><SplitMethodScreen /></BillProvider>);
+  });
+  await act(async () => {
+    current.setTotalInput("9.00");
+    current.addPerson("A");
+    current.addPerson("B");
+    current.addPerson("C");
+  });
+  const view = JSON.stringify(root.toJSON());
+  assert.match(view, /₹3\.00 each/);
+  assert.match(view, /Everyone pays the same amount/);
+  await act(async () => root.unmount());
+});
 test("mounted Review share handler rejects invalid current state, handles dismissal/failure, and prevents duplicate launch", async () => {
   let root: ReactTestRenderer;
   await act(async () => {

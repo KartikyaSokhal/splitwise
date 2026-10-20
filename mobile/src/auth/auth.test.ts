@@ -159,3 +159,21 @@ test("logout wins against late authentication and concurrent login is suppressed
   assert.equal(c.getSnapshot().user, null);
   assert.equal(logouts, 2);
 });
+test("overlapping cold restores do not claim completion before the real restore settles", async () => {
+  let finish!: (value: typeof user) => void;
+  let calls = 0;
+  const controller = new AuthController(port({
+    restore: () => {
+      calls++;
+      return new Promise((resolve) => { finish = resolve; });
+    },
+  }));
+  const first = controller.restore();
+  await controller.restore();
+  assert.equal(calls, 1);
+  assert.equal(controller.getSnapshot().restored, false);
+  finish(user);
+  await first;
+  assert.equal(controller.getSnapshot().restored, true);
+  assert.deepEqual(controller.getSnapshot().user, user);
+});

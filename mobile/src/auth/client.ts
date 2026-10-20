@@ -19,7 +19,7 @@ export function createAuthRuntime() {
   const config = readAuthConfig(
     process.env.EXPO_PUBLIC_SUPABASE_URL,
     process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    process.env.EXPO_PUBLIC_AUTH_SCHEME ?? "split-auth",
+    process.env.EXPO_PUBLIC_AUTH_SCHEME ?? "dueshare",
   );
   if (!config || Platform.OS === "web") return null; // native-only foundation
   ensurePkceCrypto();

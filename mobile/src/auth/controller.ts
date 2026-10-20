@@ -44,6 +44,9 @@ export class AuthController {
     for (const listener of this.listeners) listener();
   }
   async restore() {
+    // A second AppState revalidation may arrive during cold restore. It must not
+    // mark the session restored while the first request is still unresolved.
+    if (!this.port || this.state.busy || this.inFlight) return;
     try {
       await this.run(() => this.port!.restore(), true);
     } finally {

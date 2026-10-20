@@ -18,6 +18,7 @@ let auth = {
   user: { id: user } as { id: string } | null,
   generation: 1,
   configured: true,
+  restored: true,
   busy: false,
   message: null,
   signIn: async () => {},
@@ -161,6 +162,19 @@ test("mounted Home and Account keep guest action explicit and expose no Apple/ph
   assert(button(account, "Continue with Google"));
   assert(!/Apple|phone|OTP|coming next/.test(text(account)));
   await act(async () => account.unmount());
+});
+test("cold account restore does not block offline Quick Split or reveal saved groups", async () => {
+  auth = { ...auth, user: null, restored: false };
+  repo = null;
+  let bill: ReturnType<typeof useBill>;
+  function Capture() { bill = useBill(); return null; }
+  const root = await mount(<BillProvider><Capture /><HomeScreen /></BillProvider>);
+  assert.match(text(root), /Checking saved groups/);
+  assert(!button(root, "Groups"));
+  await act(async () => button(root, "Quick Split while account restores").props.onPress());
+  assert.equal(bill!.currentScreen, "ENTER_TOTAL");
+  await act(async () => root.unmount());
+  auth = { ...auth, restored: true };
 });
 test("mounted group navigation creates once, opens persisted group, and hardware Back respects nested history", async () => {
   auth = { ...auth, user: { id: user } };
@@ -475,6 +489,7 @@ test("mounted authenticated Home displays greeting, real groups, net position, a
     user: { id: user },
     generation: 1,
     configured: true,
+    restored: true,
     busy: false,
     message: null,
     signIn: async () => {},
@@ -505,6 +520,68 @@ test("mounted authenticated Home displays greeting, real groups, net position, a
     button(root, "Quick Split, no account needed").props.onPress(),
   );
   assert.equal(bill!.currentScreen, "ENTER_TOTAL");
+  await act(async () => root.unmount());
+  repo.dispose();
+});
+
+test("dashboard shows an unavailable balance when its snapshot cannot load, without blocking Quick Split", async () => {
+  auth = { ...auth, user: { id: user }, restored: true };
+  repo = new CloudRepository(user, async (name) => {
+    if (name === "split_list_groups") return [dto()];
+    throw new Error("private database diagnostic");
+  });
+  let bill: ReturnType<typeof useBill>;
+  function Capture() { bill = useBill(); return null; }
+  const root = await mount(<BillProvider><Capture /><HomeScreen /></BillProvider>);
+  assert.match(text(root), /Balance unavailable/);
+  assert(!text(root).includes("private database diagnostic"));
+  await act(async () => button(root, "Quick Split, no account needed").props.onPress());
+  assert.equal(bill!.currentScreen, "ENTER_TOTAL");
+  await act(async () => root.unmount());
+  repo.dispose();
+});
+
+test("dashboard never labels a group settled when the current account has no linked Person", async () => {
+  auth = { ...auth, user: { id: user }, restored: true };
+  const unlinked = { ...group, people: group.people.map((p) => ({ ...p, user_id: null })) };
+  repo = new CloudRepository(user, async (name) => {
+    if (name === "split_list_groups" || name === "split_group_snapshot") return name === "split_list_groups" ? [dto(unlinked)] : dto(unlinked);
+    throw new Error("Unexpected operation");
+  });
+  const root = await mount(<BillProvider><HomeScreen /></BillProvider>);
+  assert.match(text(root), /Balance unavailable/);
+  assert(!text(root).includes("All settled"));
+  await act(async () => root.unmount());
+  repo.dispose();
+});
+
+test("dashboard group shortcut carries only the selected group id into protected navigation", async () => {
+  auth = { ...auth, user: { id: user }, restored: true };
+  repo = new CloudRepository(user, async (name) => {
+    if (name === "split_list_groups") return [dto()];
+    if (name === "split_group_snapshot") return dto();
+    throw new Error("Unexpected operation");
+  });
+  let bill: ReturnType<typeof useBill>;
+  function Capture() { bill = useBill(); return null; }
+  const root = await mount(<BillProvider><Capture /><HomeScreen /></BillProvider>);
+  const shortcut = root.root.findAllByType("Pressable" as any).find((n) =>
+    String(n.props.accessibilityLabel).startsWith("Open Trip, "));
+  assert(shortcut);
+  await act(async () => shortcut.props.onPress());
+  assert.equal(bill!.currentScreen, "GROUPS");
+  assert.deepEqual(bill!.cloudTarget, { type: "group", id: g });
+  await act(async () => root.unmount());
+  repo.dispose();
+});
+
+test("dashboard list failure is redacted and still leaves offline Quick Split available", async () => {
+  auth = { ...auth, user: { id: user }, restored: true };
+  repo = new CloudRepository(user, async () => { throw new Error("secret transport text"); });
+  const root = await mount(<BillProvider><HomeScreen /></BillProvider>);
+  assert.match(text(root), /Could not load your saved data/);
+  assert(!text(root).includes("secret transport text"));
+  assert(button(root, "Quick Split, no account needed"));
   await act(async () => root.unmount());
   repo.dispose();
 });
